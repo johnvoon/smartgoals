@@ -43,7 +43,7 @@ module SmartGoals
             target_date = CLI.ask("When do you aim to complete this task by (dd-mm-yyyy)? Make sure your timeframe is realistic.")
           end
 
-          task = Task.new(
+          @tasks << Task.new(
             description: description,
             frequency: frequency,
             target_date: Date.strptime(target_date, '%d-%m-%Y')

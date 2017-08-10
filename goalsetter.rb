@@ -29,7 +29,7 @@ module SmartGoals
         when '1' 
           create_goal
         when '2'
-          view_goal
+          view_goals
         when '3'
           edit_goal
         when '4'
@@ -40,21 +40,31 @@ module SmartGoals
       end
     end
 
+    # What can it do
+    # TODO
+    # add_goal
+    # remove_goal
+
     def create_goal
       system "clear"
       goal = Goal.new
       goal.description = CLI.ask('What goal would you like to achieve?')
       goal.set_tasks
+      @goals << goal
     end
 
-    def view_goal
+    def view_goals
       system "clear"
-      
+      if @goals.empty?
+        choice = CLI.agree("You haven't set any goal yet. Set a goal now? (y/n)")
+        if choice
+          create_goal
+        end
+      else
+        goals = {}        
+        @goals.each_with_index { |goal| goals["#{index + 1}"] = goal.description }
+        goal = PROMPT.select("Select a goal to review:", goals)
+      end
     end
-
-    # What can it do
-    # TODO
-    # add_goal
-    # remove_goal
   end
 end
