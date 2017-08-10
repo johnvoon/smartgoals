@@ -6,7 +6,7 @@ module SmartGoals
     # description : String
     # completed : Boolean
     # sub_goals : Array of SubGoal
-    attr_accessor :description, :completed, :sub_goals
+    attr_accessor :description, :target_date, :completed, :sub_goals
 
     # How to describe it
     def initialize
