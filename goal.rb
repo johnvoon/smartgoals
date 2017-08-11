@@ -9,7 +9,7 @@ module SmartGoals
     attr_accessor :description
     attr_accessor :target_date
     attr_accessor :completed
-    attr_accessor :sub_goals
+    attr_accessor :tasks
 
     # How to describe it
     def initialize
@@ -18,10 +18,22 @@ module SmartGoals
     end
 
     def display_goal(goal)
-      puts "Your Goal: #{goal.description}"
+      puts "YOUR CURRENT GOAL IS: #{goal.description}"
     end
 
-    def display_tasks
+    def display_task_options(selected_operation) 
+      # selected_operation: String
+      tasks = {}
+      @tasks.each_with_index { |task, index| goals["#{index + 1}. #{task.description}"] = "#{index + 1}"}
+      selected_task = SmartGoals::PROMPT.select(
+        "Select a task to #{selected_operation}?", 
+        tasks
+      )
+
+      selected_task
+    end
+
+    def display_tasks_table
       rows = []
 
       if !@tasks.empty?
@@ -50,12 +62,19 @@ module SmartGoals
     def set_tasks
       system "clear"
       display_goal(self)
-      puts "\nIt's time to set specific tasks so you can achieve your goal."
+      puts <<~MESSAGE
+        
+        Hey welcome to the goal refinement centre! 
+        
+        As you go through this process you'll see your vague unspecific goal transform into something specific and actionable. You'll know exactly what your goal is and the specific tasks you need to complete to get there. You can imagine your goal now as piece of raw steel but by the time you go through this process it will be forged into a sword.
+      
+      MESSAGE
+
       email = ''
       loop do
         system "clear"
         display_goal(self)
-        display_tasks
+        display_tasks_table
 
         if CLI.agree("\nSet a new task? (yes/no)")
           description = CLI.ask("\nDescribe your task:")
@@ -83,6 +102,20 @@ module SmartGoals
           break
         end
       end
+    end
+
+    def view_tasks
+      puts "View Tasks"
+    end
+
+    def edit_tasks
+      puts "Edit tasks"
+      display_task_options("edit")
+    end
+
+    def delete_tasks
+      puts "Delete tasks"
+      display_task_options("delete")
     end
 
     # What can it do

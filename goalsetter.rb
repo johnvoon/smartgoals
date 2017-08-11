@@ -47,8 +47,9 @@ module SmartGoals
 
     def create_goal
       system "clear"
-      goal = Goal.new      
-      goal.description = CLI.ask("Please Enter your goal. Don't worry about it too much at this point. We're just trying to get a base direction and will refine it later.")
+      goal = Goal.new
+      goal.description = CLI.ask('What goal would you like to achieve?')
+      goal.target_date = Date.strptime(CLI.ask('When do you aim to achieve this goal by?'), "%d-%m-%Y")
       goal.set_tasks
       @goals << goal
     end
