@@ -4,13 +4,13 @@
 
 - Move Date to Goal for recurring tasks (JOHN)
 - Validations email, date input - check if there's a gem# (GLENN)
-- Display task saved after adding task (JOHN)
-- View Goals - fix bug (JOHN)
-- Update Goals (JOHN)
-- Remove Goals (JOHN)
-- View tasks
-- Update tasks
-- Remove Tasks
+- [DONE] Display task saved after adding task (JOHN)
+- [DONE] View Goals - fix bug (ALESSIO)
+- Update Goals (ALESSIO)
+- Remove Goals (ALESSIO)
+- View tasks (JOHN)
+- Update tasks (JOHN)
+- Remove Tasks (JOHN)
 - Popup reminders background job (GLENN)
 - Task stats/progress (ALESSIO)
 - Documentation (ALESSIO/CHRIS)
