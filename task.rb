@@ -1,17 +1,17 @@
 # Purpose: To contain the attributes of the tasks
 class Task
   # What it has
-  # id : Integer  - To identify the task uniquely
   # description : String
-  # start_date : DateTime
-  # target_date : DateTime
+  # start_date : Time
+  # target_date : Time
   # mark_complete : Boolean
-  # completion_date : DateTime
+  # completion_date : Time
   # status : Symbol :todo :completed :failed
   # frequency : Symbol :off :daily :weekly :monthly :annual
-  # reminder_date : DateTime
+  # reminder_date : Time
   # reminder : String
   attr_accessor :description
+  attr_accessor :start_date
   attr_accessor :target_date
   attr_accessor :mark_complete
   attr_accessor :completion_date
@@ -25,6 +25,7 @@ class Task
       @description = task[:description]  
       @status = :todo # Status is set to a "todo" upon creation
       @frequency = task[:frequency] || :off
+      @start_date = Time.now.getlocal
   end
 
   # What can it do
