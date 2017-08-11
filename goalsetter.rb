@@ -14,7 +14,7 @@ module SmartGoals
       loop do
         system "clear"
         puts <<~MESSAGE
-          Welcome to SMART Goals! We will guide you through the process of setting SMART goals.
+          Welcome to SMART Goals! We'll be guiding you through the process of setting SMART goals.
 
         MESSAGE
         choice = SmartGoals::PROMPT.select("What would you like to do?") do |menu|
@@ -26,7 +26,7 @@ module SmartGoals
         end
 
         case choice
-        when '1' 
+        when '1'
           create_goal
         when '2'
           view_goals
@@ -49,6 +49,7 @@ module SmartGoals
       system "clear"
       goal = Goal.new
       goal.description = CLI.ask('What goal would you like to achieve?')
+      goal.target_date = Date.strptime(CLI.ask('When do you aim to achieve this goal by?'), "%d-%m-%Y")
       goal.set_tasks
       @goals << goal
     end
@@ -61,7 +62,7 @@ module SmartGoals
           create_goal
         end
       else
-        goals = {}        
+        goals = {}
         @goals.each_with_index { |goal| goals["#{index + 1}"] = goal.description }
         goal = PROMPT.select("Select a goal to review:", goals)
       end

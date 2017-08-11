@@ -2,7 +2,11 @@ require 'date'
 require 'rufus-scheduler'
 require 'highline'
 require 'tty-prompt'
+<<<<<<< HEAD
 require 'os'
+=======
+require 'terminal-table'
+>>>>>>> a99b3c95cdc754123ffbb1813577f7fefffb9831
 
 require_relative 'goalsetter'
 require_relative 'goal'
