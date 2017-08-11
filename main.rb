@@ -2,6 +2,7 @@ require 'date'
 require 'rufus-scheduler'
 require 'highline'
 require 'tty-prompt'
+require 'os'
 
 require_relative 'goalsetter'
 require_relative 'goal'
