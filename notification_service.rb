@@ -1,7 +1,7 @@
 # Purpose:
 # To create a notification service that allows the user see reminders on their computer
 # Compatibility
-# Mac, Linux  (soon Windows)
+# Mac, Linux (soon Windows)
 
 class NotificationService
   

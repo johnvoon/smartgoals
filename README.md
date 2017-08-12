@@ -11,7 +11,7 @@
 - View tasks (JOHN)
 - Update tasks (JOHN)
 - Remove Tasks (JOHN)
-- Popup reminders background job (GLENN)
+- [DONE] Popup reminders background job (GLENN)
 - Task stats/progress (ALESSIO)
 - Documentation (ALESSIO/CHRIS)
 - Program flow - guide through SMART Goal setting process, e.g. allow editing of goal description at the end of the process (JOHN/CHRIS)

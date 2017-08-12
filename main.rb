@@ -16,6 +16,8 @@ require_relative 'notification_service'
 
 # Some facts about the app:
 # This is a Single User App
+# It is compatible with MacOS, Linux
+# Windows support will be added soon
 # It guides users by asking the right questions in a very SMART way
 
 module SmartGoals

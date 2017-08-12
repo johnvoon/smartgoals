@@ -5,7 +5,7 @@
 #   t.description = 'Learn Ruby'
 #   t.target_time = Time.parse('2017/08/11 16:20:00 +10:00')
 #   t.create_reminder_notification
-#   t.create_failed_notification
+#   t.create_failed_notification]
 
 module SmartGoals
   class Task
