@@ -45,14 +45,15 @@ class NotificationService
       # If windows
     end
   end
+
+  # Stop notification service - In the event that we need to cancel the notification service outside the class
+  def stop_notification_service
+    @scheduler.shutdown # Kills the notification service
+  end
 end
 
 
 ### Stuff that can be added later on
-# # Stop notification service - In the event that we need to cancel the notification service outside the class
-  # def stop_notification_service
-  #   @scheduler.shutdown # Kills the notification service
-  # end
 
   # # Get Frequency String
   # def get_frequency_string(start_time, frequency)

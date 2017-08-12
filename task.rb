@@ -37,10 +37,7 @@ module SmartGoals
     end
 
     # What can it do
-    # TODO
-    # send_message - reminder, notification, encouragement
-    
-    # 1 hour before (end time minus 1 hour)
+    # Create notifications
     def create_reminder_notification
       #puts "Creating reminder notification"
       @reminder = NotificationService.new
@@ -53,7 +50,16 @@ module SmartGoals
       @reminder.create_notification_service(message, @start_time, reminder_time)
       @notifications << @reminder
     end
-    
+
+    # Failed notification (Target time was met)
+    def create_failed_notification
+        #puts "Creating failed notification"
+        @failed_message = NotificationService.new
+        message = "You failed to achieve your task: #{@description}"
+        @failed_message.create_notification_service(message, @start_time, @target_time)
+        @notifications << @failed_message
+    end
+
     # Get reminder minute before target time
     def get_reminder_minute(time, before_minutes)
       (time.to_datetime - (before_minutes/1440.0)).to_time
@@ -64,19 +70,10 @@ module SmartGoals
       (time.to_datetime - (before_hours/24.0)).to_time
     end
 
-    # Failed notification (end time met)
-    def create_failed_notification
-        #puts "Creating failed notification"
-        @failed_message = NotificationService.new
-        message = "You failed to achieve your task: #{@description}"
-        @failed_message.create_notification_service(message, @start_time, @target_time)
-        @notifications << @failed_message
-    end
-
-    # Cancel all notifications
+    # Cancel all notifications (Just in case it is needed)
     def remove_notifications
       @notifications.each do |notification|
-        notification.cancel_notification_service
+        notification.stop_notification_service
       end
     end
   end
