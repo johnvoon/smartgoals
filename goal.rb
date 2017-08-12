@@ -19,10 +19,12 @@ module SmartGoals
       @completed = false # Goal is set to "not completed" upon creation
     end
 
+    # Add new task to list of tasks
     def add_task(task)
       @tasks << task
     end
 
+    # Display the current goal
     def display_goal(goal)
       puts "\nYOUR CURRENT GOAL IS: #{goal.description}"
       if goal.target_date
@@ -30,6 +32,7 @@ module SmartGoals
       end
     end
 
+    # Display task options
     def display_task_options(selected_operation)
       # selected_operation: String
       tasks = {}
