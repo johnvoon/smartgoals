@@ -17,31 +17,35 @@ module SmartGoals
       @completed = false # Goal is set to "not completed" upon creation
     end
 
+    def add_task(task)
+      @tasks << task
+    end
+
     def display_goal(goal)
       puts "YOUR CURRENT GOAL IS: #{goal.description}"
     end
 
-    def display_task_options(selected_operation) 
+    def display_task_options(selected_operation)
       # selected_operation: String
       tasks = {}
       @tasks.each_with_index { |task, index| goals["#{index + 1}. #{task.description}"] = "#{index + 1}"}
       selected_task = SmartGoals::PROMPT.select(
-        "Select a task to #{selected_operation}?", 
+        "Select a task to #{selected_operation}?",
         tasks
       )
 
       selected_task
     end
 
-    def display_tasks_table
+    def display_tasks
       rows = []
 
       if !@tasks.empty?
         @tasks.each_with_index do |task, index|
           rows << [
-            index.to_s,
+            (index + 1).to_s,
             task.description,
-            task.frequency.to_s.capitalize,
+            task.frequency.to_s.gsub('_', ' ').capitalize,
             task.target_date ? task.target_date.strftime("%d/%m/%Y") : ""
           ]
         end
@@ -59,63 +63,157 @@ module SmartGoals
       puts table
     end
 
-    def set_tasks
+    def get_frequency
+      PROMPT.select("\nHow often would you like to do this task?") do |menu|
+        menu.choice 'Every Minute', :every_minute
+        menu.choice 'Hourly', :hourly
+        menu.choice 'Daily', :daily
+        menu.choice 'Weekly', :weekly
+        menu.choice 'Monthly', :monthly
+        menu.choice 'Yearly', :yearly
+      end
+    end
+
+    def create_tasks
       system "clear"
       display_goal(self)
       puts <<~MESSAGE
-        
-        Hey welcome to the goal refinement centre! 
-        
+
+        Hey welcome to the goal refinement centre!
+
         As you go through this process you'll see your vague unspecific goal transform into something specific and actionable. You'll know exactly what your goal is and the specific tasks you need to complete to get there. You can imagine your goal now as piece of raw steel but by the time you go through this process it will be forged into a sword.
-      
+
       MESSAGE
 
-      email = ''
       loop do
         system "clear"
         display_goal(self)
-        display_tasks_table
+        display_tasks
 
         if CLI.agree("\nSet a new task? (yes/no)")
-          description = CLI.ask("\nDescribe your task:")
+          task = Task.new
+          task.description = CLI.ask("\nDescribe your task:")
+          task.frequency = get_frequency
+          task.creation_date = Time.now.getlocal
 
-          if CLI.agree("\nIs this a task to be done regularly (yes/no)?")
-            email = CLI.ask("\nEnter your email where for receiving reminders?") if email.empty?
-            frequency = PROMPT.select("\nHow often would you like to do this task?") do |menu|
-              menu.choice 'Daily', :daily
-              menu.choice 'Weekly', :weekly
-              menu.choice 'Monthly', :monthly
-              menu.choice 'Yearly', :yearly
+          case task.frequency
+          when :once
+            target_date = CLI.ask("\nWhen do you aim to complete this task by (dd-mm-yyyy)? Make sure your timeframe is realistic.") do |q|
+              q.validate = Helpers.valid_date?
+              q.responses[:not_valid] = "Please enter a date in the future."
+              q.responses[:invalid_type] = "Please enter a valid date in the format 'dd-mm-yyyy'."
             end
+            task.target_date = Time.strptime(target_date, '%d-%m-Y')
           else
-            system "clear"
-            puts ""
-            target_date = CLI.ask("\nWhen do you aim to complete this task by (dd-mm-yyyy)? Make sure your timeframe is realistic.")
+            task.target_date = Helpers.calculate_task_target_date(
+              task.creation_date,
+              task.frequency
+            )
           end
 
-          @tasks << Task.new(
-            description: description,
-            frequency: frequency,
-            target_date: target_date ? Date.strptime(target_date, '%d-%m-%Y') : nil
-          )
+          # Create notifications for task
+          task.create_reminder_notification
+          task.create_failed_notification
+          task.schedule_recurring_task_creation(self) if task.frequency != :once
+
+          add_task(task)
         else
           break
         end
       end
     end
 
+    def set_task_target_date(task)
+    end
+
+    def display_task_management_menu
+      loop do
+        system "clear"
+        choice = PROMPT.select("What would you like to do for your goal?") do |menu|
+          menu.choice 'Create New Tasks', '1'
+          menu.choice 'Edit Task', '2'
+          menu.choice 'Delete Task', '3'
+          menu.choice 'Mark Tasks Complete', '4'
+          menu.choice 'Back', '5'
+        end
+
+        case choice
+        when '1'
+          create_tasks
+        when '2'
+          edit_task
+        when '3'
+          delete_task
+        when '4'
+          mark_task_complete
+        when '5'
+          break
+        end
+      end
+    end
+
+    def get_task_choice(operation)
+      system "clear"
+      if @tasks.empty?
+        choice = CLI.agree("You haven't set any tasks yet. Set a task now? (y/n)")
+        if choice
+          create_tasks
+        end
+      else
+      tasks = {}
+      @tasks.each_with_index { |task, index| tasks["#{index + 1}. #{task.description}"] = task }
+      task = PROMPT.select("Select a task to #{operation}:", tasks)
+      end
+      task
+    end
+
     def view_tasks
       puts "View Tasks"
+      get_task_choice("view")
     end
 
-    def edit_tasks
-      puts "Edit tasks"
-      display_task_options("edit")
+    def edit_task
+      system "clear"
+      task = get_task_choice("edit")
+      loop do
+        system "clear"
+
+        attributes = {
+          "Description: #{task.description}": :description,
+          "Frequency: #{task.frequency}": :frequency,
+          "Back": :back
+        }
+        attribute = PROMPT.select("Select which task attribute to edit", attributes)
+        if attribute == :description
+          description = CLI.ask("Enter new description")
+          task.description = description
+        elsif attribute == :frequency
+          frequency = get_frequency
+          task.frequency = frequency
+        elsif attribute == :back
+          break
+        end
+        break unless CLI.agree("Edit another attribute? (y/n)")
+      end
     end
 
-    def delete_tasks
-      puts "Delete tasks"
-      display_task_options("delete")
+    def delete_task
+      system "clear"
+      loop do
+        task = get_task_choice("delete")
+        @tasks.delete(task)
+        break unless CLI.agree("Delete another task? (y/n)")
+      end
+    end
+
+    def mark_task_complete
+      system "clear"
+      loop do
+        task = get_task_choice("mark complete")
+        task.status = :completed
+        puts "Congratulations on completing this task!"
+        break unless CLI.agree("Mark another task complete? (y/n)")
+      end
     end
 
     # What can it do

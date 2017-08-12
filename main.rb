@@ -1,13 +1,17 @@
 require 'date'
+require 'time'
 require 'rufus-scheduler'
 require 'highline'
 require 'tty-prompt'
 require 'terminal-table'
+require 'os'
+require 'concurrent'
 
+require_relative 'helpers'
 require_relative 'goalsetter'
 require_relative 'goal'
 require_relative 'task'
-require_relative 'notification_service'
+require_relative 'scheduler'
 
 # People need a SMART Goal Setter because they have Goals.
 # In every Goal, there are Tasks that need to be achieved/completed.
@@ -20,28 +24,6 @@ require_relative 'notification_service'
 module SmartGoals
   PROMPT = TTY::Prompt.new
   CLI = HighLine.new
-  GoalSetter.new.run_program
+  GOALSETTER = GoalSetter.new
+  GOALSETTER.run_program
 end
-# notificationService = NotificationService.new
-
-# t1 = Thread.new {
-#     notificationService.message
-# }
-
-# t2 = Thread.new {
-#     while true do
-#         print "You can do anything until you type exit : "
-#         test_input = gets.chomp
-#         if test_input == 'exit'
-#             notificationService.shutdown   # Shutdown the Notification Service when you exit the app
-#             break
-#         else
-#             puts test_input
-#         end
-#     end
-# }
-# t1.join
-# t2.join
-
-# system("echo 'Hello Smart Goals!' | terminal-notifier -sound default")
-

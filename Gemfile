@@ -1,7 +1,13 @@
 # frozen_string_literal: true
+
 source "https://rubygems.org"
 
-gem "rufus-scheduler"
-gem "highline"
-gem "tty-prompt"
-gem "terminal-table"
+gem 'highline'
+gem 'mail'
+gem 'os'
+gem 'rufus-scheduler'
+gem 'tty-prompt'
+gem 'terminal-table'
+gem 'concurrent-ruby'
+
+

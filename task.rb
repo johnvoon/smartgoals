@@ -2,37 +2,44 @@
 module SmartGoals
   class Task
     # What it has
-    # id : Integer  - To identify the task uniquely
-    # description : String
-    # start_date : DateTime
-    # target_date : DateTime
-    # mark_complete : Boolean
-    # completion_date : DateTime
-    # status : Symbol :todo :completed :failed
-    # frequency : Symbol :off :daily :weekly :monthly :annual
-    # reminder_date : DateTime
-    # reminder : String
     attr_accessor :description
+    attr_accessor :start_time
     attr_accessor :creation_date
     attr_accessor :target_date
-    attr_accessor :mark_complete
     attr_accessor :completion_date
-    attr_accessor :status
-    attr_accessor :frequency
-    attr_accessor :reminder_date
-    attr_accessor :reminder
+    attr_accessor :status # Symbol :todo :completed :failed
+    attr_accessor :frequency # Symbol :once :daily :weekly :monthly :yearly
+    attr_accessor :notifications
 
     # How to describe it
-    def initialize(task)
-        @description = task[:description]  
-        @status = :todo # Status is set to a "todo" upon creation
-        @frequency = task[:frequency] || :off
-        @target_date = task[:target_date]
+    def initialize
+      @status = :todo # Status is set to a "todo" upon creation
     end
 
     # What can it do
     # TODO
     # send_message - reminder, notification, encouragement
 
+    def create_reminder_notification
+      scheduler = Scheduler.new
+      reminder_time = case self.frequency
+                      when :every_minute then self.target_date - 55
+                      when :hourly then self.target_date - (60 * 30)
+                      else self.target_date - (60 * 60 * 24)
+                      end
+      message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{@description}"
+      scheduler.schedule_notification(message, reminder_time)
+    end
+
+    def create_failed_notification
+      scheduler = Scheduler.new
+      message = "Hey #{GOALSETTER.name}, you did not #{@description}!"
+      scheduler.schedule_notification(message, @target_date)
+    end
+
+    def schedule_recurring_task_creation(goal)
+      scheduler = Scheduler.new
+      scheduler.schedule_task_creation(goal, self, @target_date)
+    end
   end
 end
