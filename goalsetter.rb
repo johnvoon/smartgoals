@@ -30,13 +30,16 @@ module SmartGoals
       system "clear"
       puts "Welcome to SMART Goals!"
 
+      # Ask for the user's name
       @name = CLI.ask("\nWhat's your name?") do |n|
         # Check if the user's name is empty
         n.validate = Helpers.not_empty?
         n.responses[:not_valid] = "\nInvalid name. Please enter a valid name."
       end
 
+      # Ask for the user's email
       @email = CLI.ask("\nWhat is your email? This is where we will be sending you notifications.") do |q|
+        # Check if the user's email is valid
         q.validate = Helpers.valid_email?
         q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
       end
@@ -46,8 +49,11 @@ module SmartGoals
     def get_goal_management_choice
       loop do
         system "clear"
+
+        # Make the user feel welcome
         puts "\nHi #{@name}! We will be guiding you through the process of setting SMART goals."
         
+        # Ask the user for a menu choice
         choice = PROMPT.select("\nIf you are new user, select 'Create a SMART Goal'.") do |menu|
           menu.choice 'Create a SMART Goal', '1'
           menu.choice 'View a SMART Goal', '2'
@@ -57,16 +63,16 @@ module SmartGoals
         end
 
         case choice
-        when '1'
-          create_goal
-        when '2'
-          view_goals
-        when '3'
-          edit_goal
-        when '4'
-          delete_goal
-        when '5'
-          break
+          when '1'  # Create a SMART Goal
+            create_goal
+          when '2'  # View a SMART Goal
+            view_goals
+          when '3'  # Edit a SMART Goal
+            edit_goal
+          when '4'  # Delete a SMART Goal
+            delete_goal
+          when '5'  # Exit
+            break
         end
       end
     end
@@ -195,7 +201,7 @@ module SmartGoals
       goal.display_task_management_menu
     end
 
-    # Edits a goal
+    # Edit a goal
     def edit_goal
       system "clear"
       goal = display_goals("edit")
@@ -220,7 +226,7 @@ module SmartGoals
       end
     end
 
-    # Deletes a goal
+    # Delete a goal
     def delete_goal
       system "clear"
       loop do
