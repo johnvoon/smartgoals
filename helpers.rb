@@ -20,7 +20,7 @@ module SmartGoals
 
     def convert_frequency_to_seconds(frequency)
       case frequency
-      when :every_minute then 7
+      when :every_minute then 60
       when :hourly then (60 * 60)
       when :weekly then (60 * 60 * 24 * 7)
       when :monthly then (60 * 60 * 24 * 28)

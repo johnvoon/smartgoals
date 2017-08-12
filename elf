@@ -1,0 +1,14 @@
+=> [32m#<SmartGoals::Goal:0x0056208f3c9050[0m
+ @attainable[32m=[0m[31m[1;31m"[0m[31mawdawd[1;31m"[0m[31m[0m,
+ @completed[32m=[0m[1;36mfalse[0m,
+ @description[32m=[0m[31m[1;31m"[0m[31makwjdnakwjdn[1;31m"[0m[31m[0m,
+ @relevant[32m=[0m[31m[1;31m"[0m[31mawdaw[1;31m"[0m[31m[0m,
+ @target_date[32m=[0m[32m#<Date: 2018-02-22 ((2458172j,0s,0n),+0s,2299161j)>[0m,
+ @tasks[32m=[0m
+  [[32m#<SmartGoals::Task:0x0056208f35ec00[0m
+    @creation_date[32m=[0m[1;34m2017[0m-[1;34m08[0m-[1;34m12[0m [1;34m23[0m:[1;34m23[0m:[1;34m05[0m +[1;34m1000[0m,
+    @description[32m=[0m[31m[1;31m"[0m[31mawndkajwdn[1;31m"[0m[31m[0m,
+    @frequency[32m=[0m[33m:every_minute[0m,
+    @goal[32m=[0m[32m#<SmartGoals::Goal:0x0056208f3c9050[0m ...[32m>[0m,
+    @status[32m=[0m[33m:todo[0m,
+    @target_date[32m=[0m[1;34m2017[0m-[1;34m08[0m-[1;34m12[0m [1;34m23[0m:[1;34m24[0m:[1;34m05[0m +[1;34m1000[0m[32m>[0m][32m>[0m

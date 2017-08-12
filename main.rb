@@ -6,12 +6,13 @@ require 'tty-prompt'
 require 'terminal-table'
 require 'os'
 require 'concurrent'
+require 'mail'
 
 require_relative 'helpers'
 require_relative 'goalsetter'
 require_relative 'goal'
 require_relative 'task'
-require_relative 'scheduler'
+require_relative 'notification_service'
 
 # People need a SMART Goal Setter because they have Goals.
 # In every Goal, there are Tasks that need to be achieved/completed.

@@ -10,6 +10,8 @@ module SmartGoals
     attr_accessor :target_date
     attr_accessor :completed
     attr_accessor :tasks
+    attr_accessor :attainable
+    attr_accessor :relevant
 
     # How to describe it
     def initialize
@@ -22,7 +24,10 @@ module SmartGoals
     end
 
     def display_goal(goal)
-      puts "YOUR CURRENT GOAL IS: #{goal.description}"
+      puts "\nYOUR CURRENT GOAL IS: #{goal.description}"
+      if goal.target_date
+        puts "TARGET DATE TO REACH YOUR GOAL: #{goal.target_date.strftime('%-d %B %Y')}"
+      end
     end
 
     def display_task_options(selected_operation)
@@ -65,6 +70,7 @@ module SmartGoals
 
     def get_frequency
       PROMPT.select("\nHow often would you like to do this task?") do |menu|
+        menu.choice 'Just once', :once
         menu.choice 'Every Minute', :every_minute
         menu.choice 'Hourly', :hourly
         menu.choice 'Daily', :daily
@@ -76,21 +82,11 @@ module SmartGoals
 
     def create_tasks
       system "clear"
-      display_goal(self)
-      puts <<~MESSAGE
-
-        Hey welcome to the goal refinement centre!
-
-        As you go through this process you'll see your vague unspecific goal transform into something specific and actionable. You'll know exactly what your goal is and the specific tasks you need to complete to get there. You can imagine your goal now as piece of raw steel but by the time you go through this process it will be forged into a sword.
-
-      MESSAGE
-
-      loop do
-        system "clear"
-        display_goal(self)
-        display_tasks
-
-        if CLI.agree("\nSet a new task? (yes/no)")
+      puts "\nAt the moment your goal is still too big and daunting to be achieved. So we will need to break your goal down into a series of tasks. Make sure these tasks also meet the SMART criteria."
+      if CLI.agree("\nWould you like to set these tasks now? (y/n)")
+        loop do
+          display_goal(self)
+          display_tasks
           task = Task.new
           task.description = CLI.ask("\nDescribe your task:")
           task.frequency = get_frequency
@@ -109,21 +105,39 @@ module SmartGoals
               task.creation_date,
               task.frequency
             )
+            schedule_recurring_task_creation(task)
           end
 
-          # Create notifications for task
+          add_task(task)
+          task.goal = self
           task.create_reminder_notification
           task.create_failed_notification
-          task.schedule_recurring_task_creation(self) if task.frequency != :once
-
-          add_task(task)
-        else
-          break
+          
+          system "clear"
+          display_goal(self)
+          display_tasks
+          break unless CLI.agree("\nWould you like to set a new task? (yes/no)")
         end
       end
     end
 
-    def set_task_target_date(task)
+    def schedule_recurring_task_creation(task)
+      scheduler = Rufus::Scheduler.new
+      scheduler.every "#{Helpers.convert_frequency_to_seconds(task.frequency).to_s}s" do
+        new_task = Task.new
+        new_task.description = task.description
+        new_task.frequency = task.frequency
+        new_task.creation_date = Time.now.getlocal
+        new_task.target_date = Helpers.calculate_task_target_date(
+          new_task.creation_date,
+          new_task.frequency
+        )
+
+        new_task.create_reminder_notification
+        new_task.create_failed_notification
+
+        add_task(new_task)
+      end
     end
 
     def display_task_management_menu
