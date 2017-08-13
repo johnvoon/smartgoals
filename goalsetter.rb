@@ -171,7 +171,7 @@ module SmartGoals
         6 months'. And then to have a series of tasks to complete to get there.
         We will guide you through that later."
       MESSAGE
-      description = CLI.ask("\nFor now, try and rewrite your goal so it meets this\nSMART criteria as best you can.")
+      description = CLI.ask("\nFor now, try and rewrite your goal so it meets this\nSMART criteria as best you can.\n\nDescribe your Goal:\n")
       goal.description = description if description
     end
 
@@ -211,10 +211,14 @@ module SmartGoals
     # Complete setting the goal
     def finish_setting_goal
       system "clear"
+
+      # Tell the user they did a good job
       puts <<~MESSAGE 
         Awesome, that's great. Good job on turning your original goal into a SMART goal!
         You're welcome to go back at any time to add more tasks or goals you want to achieve.
       MESSAGE
+
+      # Press enter to finish
       CLI.ask("\nPress enter to finish.")
     end
 
@@ -223,13 +227,21 @@ module SmartGoals
       system "clear"
       if @goals.empty?
         choice = CLI.agree("You haven't set any goal yet. Set a goal now? (y/n)")
-        if choice
+        if choice # if yes
           create_goal
         end
+
       else
-      goals = {}
-      @goals.each_with_index { |goal, index| goals["#{index + 1}. #{goal.description}"] = goal }
-      goal = PROMPT.select("Select a goal to #{operation}:", goals)
+        # Create new hash for goals
+        goals = {}
+        
+        # Display list of goals
+        @goals.each_with_index do |goal, index|
+          goals["#{index + 1}. #{goal.description}"] = goal
+        end
+
+        # Ask the user to select a goal
+        goal = PROMPT.select("Select a goal to #{operation}:", goals)
       end
       goal
     end
@@ -237,42 +249,74 @@ module SmartGoals
     # View list of goals
     def view_goals
       system "clear"
+      
+      # Display goals menu
       goal = display_goals("view")
-      goal.display_task_management_menu
+
+      # If goal was set
+      if !goal.nil?
+        goal.display_task_management_menu # Display task management menu
+      else
+        # Just go back to main menu
+      end
     end
 
     # Edit a goal
     def edit_goal
       system "clear"
+
+      # Display goals menu
       goal = display_goals("edit")
-      loop do
-        system "clear"
-        attributes = {
-          "Description: #{goal.description}": :description,
-          "Target Date: #{goal.target_date.strftime('%d/%m/%Y')}": :target_date,
-          "Back": :back
-        }
-        attribute = PROMPT.select("Select which attribute to edit", attributes)
-        if attribute == :description
-          description = CLI.ask("Enter new description")
-          goal.description = description
-        elsif attribute == :target_date
-          target_date = Date.strptime(CLI.ask("Enter new target date"), '%d-%m-%Y')
-          goal.target_date = target_date
-        elsif attribute == :back
-          break
+
+      # If goal was set
+      if !goal.nil?
+        loop do
+          system "clear"
+
+          # Create attributes Hash to display goal describe and target date
+          attributes = {
+            "Description: #{goal.description}": :description,
+            "Target Date: #{goal.target_date.strftime('%d/%m/%Y')}": :target_date,
+            "Back": :back
+          }
+          # Display: Select which attribute to edit
+          attribute = PROMPT.select("Select which attribute to edit", attributes)
+          if attribute == :description
+            description = CLI.ask("Enter new description")
+            goal.description = description
+
+          elsif attribute == :target_date
+            target_date = Date.strptime(CLI.ask("Enter new target date"), '%d-%m-%Y')
+            goal.target_date = target_date
+
+          elsif attribute == :back
+            break
+          end
+          # Edit another attribute, otherwise go back to main menu
+          break unless CLI.agree("Edit another attribute? (y/n)")
         end
-        break unless CLI.agree("Edit another attribute? (y/n)")
+
+      else
+        # Just go back to main menu
       end
     end
 
     # Delete a goal
     def delete_goal
       system "clear"
+
+      # Display Loop: Ask the user which goal to delete
       loop do
         goal = display_goals("delete")
-        @goals.delete(goal)
-        break unless CLI.agree("Delete another goal? (y/n)")
+
+        # If goal was set
+        if !goal.nil?
+          @goals.delete(goal)
+          break unless CLI.agree("Delete another goal? (y/n)")
+        else
+          # Just go back to main menu
+          break
+        end
       end
     end
   end
