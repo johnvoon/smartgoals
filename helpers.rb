@@ -35,6 +35,7 @@ module SmartGoals
       case frequency
       when :every_minute then 60
       when :hourly then (60 * 60)
+      when :daily then (60 * 60 * 24) 
       when :weekly then (60 * 60 * 24 * 7)
       when :monthly then (60 * 60 * 24 * 28)
       when :yearly then (60 * 60 * 24 * 365)

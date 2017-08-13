@@ -17,6 +17,18 @@ module SmartGoals
       @status = :todo # Status is set to a "todo" upon creation
     end
 
+    # Change status and colorize
+    def status_color=(status)
+      @status = status
+      puts status
+      if @status == :completed
+        self.description = self.description.colorize(:color => :black, :background => :green)
+      elsif @status == :failed
+        self.description = self.description.colorize(:red)
+      else 
+        self.description = self.description.colorize(:white)
+      end
+    end
     # What can it do
     # TODO
     # send_message - reminder, notification, encouragement
@@ -28,14 +40,18 @@ module SmartGoals
                       when :hourly then self.target_date - (60 * 30)
                       else self.target_date - (60 * 60 * 24)
                       end
-      message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{@description}"
+      # need uncolorize or it won't display popup properly
+      message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{@description.uncolorize}" 
       notification_service.schedule_popup(message, reminder_time)
       notification_service.schedule_email(GOALSETTER.email, message, reminder_time)
     end
 
     def create_failed_notification
+      # status is switched to :failed and passed to the schedule_failure function to change the text color when the time comes  
+      
+      
       notification_service = NotificationService.new
-      user_message = "Hey #{GOALSETTER.name}, You did not #{@description} today."
+      user_message = "Hey #{GOALSETTER.name}, You did not #{@description.uncolorize} today."
       user_email = <<~MESSAGE
         Hey #{GOALSETTER.name}, 
         
@@ -58,9 +74,12 @@ module SmartGoals
 
         The Smart Goals Team
       MESSAGE
+      
       notification_service.schedule_popup(user_message, @target_date)
+      notification_service.schedule_failure(@target_date, self)
       notification_service.schedule_email(GOALSETTER.email, user_email, @target_date)
       notification_service.schedule_email(GOALSETTER.friend_email, friend_email, @target_date)
+      
     end
   end
 end

@@ -93,15 +93,15 @@ module SmartGoals
         Thanks for telling us your goal! 
         
         Welcome to the Goal Refinement Centre. As you go through this process,
-        you will see your vague unspecific goal transform into something specific
+        you will see your goal being transformed from vague into something specific
         and actionable. You will know exactly what your goal is and the specific
         tasks you need to complete to get there. You can imagine your goal now as
-        piece of raw steel but by the time you go through this process it will be
+        a piece of raw steel but by the time you go through this process it will be
         forged into a sword.
       
-        Let's start out by setting an target date for achieving your goal. If you
-        don't set a target date, your goal will just remain a fantasy. Setting a
-        target date for your goal is important step in the SMART goal process.
+        Let's start out by setting a target date for achieving your goal.
+        If you don't set a target date, your goal will just remain a fantasy. 
+        This is a very important step in the SMART goal process.
       MESSAGE
       
       # Ask the user for a target date
@@ -158,8 +158,8 @@ module SmartGoals
         You've already made your goal timely in the previous step. However you'll
         need to make your goal specific, measurable, attainable and relevant as well.
       MESSAGE
+      CLI.ask("\nPress enter to continue.")
     end
-
     # Ask the user for the goal to be more specific
     def make_goal_specific(goal)
       system "clear"
@@ -178,8 +178,8 @@ module SmartGoals
     # Ask if the goal is Attainable
     def make_goal_attainable(goal)
       system "clear"
-      puts "\nIs your goal Attainable? Or is your goal too easy? Or it set at the right level?"
-      attainable = CLI.ask("\nPlease write out why you think your goal is set at the right level.")
+      puts "\nIs your goal Attainable? Or is it too far-fetched?"
+      attainable = CLI.ask("\nPlease explain why you think you can achieve your goal.")
       goal.attainable = attainable
     end
 
@@ -187,20 +187,21 @@ module SmartGoals
     def make_goal_relevant(goal)
       system "clear"
       puts "\nIs your goal Relevant? Why is this goal important to you?"
-      relevant = CLI.ask("\nPlease write out why you'd like to achieve this goal.")
+      relevant = CLI.ask("\nPlease explain why you want to achieve this goal.")
       goal.relevant = relevant
     end
 
     # Ask for the user's friend's email address
     def set_friend_email
+      system "clear"
       puts <<~MESSAGE        
-        We will now go even further and implement steps that make achieving your goals virtually
+        We will now go even further and implement steps that make achieving your goal virtually
         inevitable.
 
         Goals that you're accountable to someone to achieve are much more likely to be met than
         those where there isn't external pressure.
       MESSAGE
-      @friend_name = CLI.ask("\nPlease enter the email of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")
+      @friend_name = CLI.ask("\nPlease enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")
       email = CLI.ask("\nPlease enter his/her email:") do |q|
         q.validate = Helpers.valid_email?
         q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."

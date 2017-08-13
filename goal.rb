@@ -1,4 +1,4 @@
-require 'pry'
+# README.mdrequire 'pry'
 # Purpose: To Create Tasks
 module SmartGoals
   class Goal
@@ -102,7 +102,7 @@ module SmartGoals
               q.responses[:not_valid] = "Please enter a date in the future."
               q.responses[:invalid_type] = "Please enter a valid date in the format 'dd-mm-yyyy'."
             end
-            task.target_date = Time.strptime(target_date, '%d-%m-Y')
+            task.target_date = Time.strptime(target_date, '%d-%m-%Y')
           else
             task.target_date = Helpers.calculate_task_target_date(
               task.creation_date,
@@ -228,6 +228,8 @@ module SmartGoals
       loop do
         task = get_task_choice("mark complete")
         task.status = :completed
+        task.status_color = task.status
+              
         puts "Congratulations on completing this task!"
         break unless CLI.agree("Mark another task complete? (y/n)")
       end
