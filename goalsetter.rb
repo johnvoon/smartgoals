@@ -2,28 +2,26 @@
 module SmartGoals
   class GoalSetter
     # What it has
-    # goals : Array of Goal
-    attr_accessor :name         # The user's name:  String
-    attr_accessor :email        # The user's email: String
-    attr_accessor :friend_name  # The user's friend's name:   String
-    attr_accessor :friend_email # The user's friend's email:  String
-    attr_accessor :goals        # The user's goal:  Array of Goal
+    attr_accessor :name         # name:  String
+    attr_accessor :email        # email: String
+    attr_accessor :friend_name  # friend name:   String
+    attr_accessor :friend_email # friend email:  String
+    attr_accessor :goals        # goal:  Array of Goal
 
     # How to describe it
     def initialize
       @goals = []
     end
 
+    # What can it do
     # Start the app and display the menu
     def run_program
+      # Display welcome screen
       welcome_screen
+
+      # Display user menu choices
       get_goal_management_choice
     end
-
-    # What can it do
-    # TODO
-    # add_goal
-    # remove_goal
 
     # Display the welcome screen
     def welcome_screen
@@ -34,6 +32,8 @@ module SmartGoals
       @name = CLI.ask("\nWhat's your name?") do |n|
         # Check if the user's name is empty
         n.validate = Helpers.not_empty?
+
+        # Name is empty
         n.responses[:not_valid] = "\nInvalid name. Please enter a valid name."
       end
 
@@ -41,6 +41,8 @@ module SmartGoals
       @email = CLI.ask("\nWhat is your email? This is where we will be sending you notifications.") do |q|
         # Check if the user's email is valid
         q.validate = Helpers.valid_email?
+        
+        # Email is not in the right format
         q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
       end
     end
@@ -81,7 +83,11 @@ module SmartGoals
     def create_goal
       system "clear"
       goal = Goal.new
+      
+      # Ask the user for his Goal but not to worry about it too much at this point
       goal.description = CLI.ask("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
+      
+      # The goal description has been set. Thank the user. Tell him more about the app.
       puts <<~MESSAGE
         
         Thanks for telling us your goal! 
@@ -98,20 +104,41 @@ module SmartGoals
         target date for your goal is important step in the SMART goal process.
       MESSAGE
       
+      # Ask the user for a target date
       target_date = CLI.ask("\nPlease enter a target date (format: dd-mm-yyyy)") do |q|
+        # Validate date
         q.validate = Helpers.valid_date?
+
+        # Date should be a future date
         q.responses[:not_valid] = "Please enter a date in the future."
+
+        # Date should be in d-m-Y format
         q.responses[:invalid_type] = "Please enter a valid date."
       end
 
+      # Get the target date in d-m-Y format
       goal.target_date = Date.strptime(target_date, "%d-%m-%Y")
+
+      # Display the SMART words
       list_smart_words
+
+      # Display: Ask the user for the goal to be more specific
       make_goal_specific(goal)
+
+      # Display: Ask the user if his goal is attainable
       make_goal_attainable(goal)
+
+      # Display: Ask the user if his goal is relevant
       make_goal_relevant(goal)
+
+      # Display: Ask the user for his friend's email
       set_friend_email
+
+      # Display: Create the tasks
       goal.create_tasks
       @goals << goal
+
+      # Display: Complete setting the goal
       finish_setting_goal
     end
 
@@ -128,15 +155,23 @@ module SmartGoals
         - Relevant
         - Timely
 
-        You've already made your goal timely in the previous step. However you'll need to make your goal specific, measurable, attainable and relevant as well.
+        You've already made your goal timely in the previous step. However you'll
+        need to make your goal specific, measurable, attainable and relevant as well.
       MESSAGE
     end
 
     # Ask the user for the goal to be more specific
     def make_goal_specific(goal)
       system "clear"
-      puts "\nAt the moment your goal is still very raw. You need your goal to be specific so you can have a better idea of what your end goal is. For example if your current goal is 'lose weight', it's not specific enough so you won't know exactly what you're working towards. A better goal is 'get to 12% body-fat in 6 months'. And then to have a series of tasks to complete to get there. We'll guide you through that later."
-      description = CLI.ask("\nFor now, try and rewrite your goal so it meets this SMART criteria as best you can.")
+      puts <<~MESSAGE 
+        At the moment your goal is still very raw. You need your goal to be specific
+        so you can have a better idea of what your end goal is. For example if your
+        current goal is 'lose weight', it's not specific enough so you won't know
+        exactly what you're working towards. A better goal is 'get to 12% body-fat in
+        6 months'. And then to have a series of tasks to complete to get there.
+        We will guide you through that later."
+      MESSAGE
+      description = CLI.ask("\nFor now, try and rewrite your goal so it meets this\nSMART criteria as best you can.")
       goal.description = description if description
     end
 
@@ -159,11 +194,13 @@ module SmartGoals
     # Ask for the user's friend's email address
     def set_friend_email
       puts <<~MESSAGE        
-        We will now go even further and implement steps that make achieving your goals virtually inevitable.
+        We will now go even further and implement steps that make achieving your goals virtually
+        inevitable.
 
-        Goals that you're accountable to someone to achieve are much more likely to be met than those where there isn't external pressure.
+        Goals that you're accountable to someone to achieve are much more likely to be met than
+        those where there isn't external pressure.
       MESSAGE
-      @friend_name = CLI.ask("\nPlease enter the email of someone that you don't want to let down. We will let them know if you failed to achieve your goals and get them to hassle you.")
+      @friend_name = CLI.ask("\nPlease enter the email of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")
       email = CLI.ask("\nPlease enter his/her email:") do |q|
         q.validate = Helpers.valid_email?
         q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
@@ -174,7 +211,10 @@ module SmartGoals
     # Complete setting the goal
     def finish_setting_goal
       system "clear"
-      puts "\nAwesome, that's great. Good job on turning your original goal into a SMART goal! You're welcome to go back at any time to add more tasks or goals you want to achieve."
+      puts <<~MESSAGE 
+        Awesome, that's great. Good job on turning your original goal into a SMART goal!
+        You're welcome to go back at any time to add more tasks or goals you want to achieve.
+      MESSAGE
       CLI.ask("\nPress enter to finish.")
     end
 
