@@ -23,28 +23,65 @@ module SmartGoals
       get_goal_management_choice
     end
 
+    # Ask for a name
+    def ask_for_name(question)
+      name = CLI.ask(question)  do |q|
+          # Check if the friend's name is empty
+          q.validate = Helpers.not_empty?
+
+          # Friend name is empty
+          q.responses[:not_valid] = "\The name cannot be empty. Please enter a valid name."
+      end
+    end
+
+    # Ask for an email address
+    def ask_for_email(question)
+      email = CLI.ask(question) do |q|
+        # Check if the friend's email is empty
+        q.validate = Helpers.valid_email?
+
+        # Email is not valid
+        q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email. (e.g. someone@example.com)"
+      end
+    end
+
+    # Ask for a description
+    def ask_for_description(question)
+      description = CLI.ask(question) do |q|
+          # Check if the description is empty
+          q.validate = Helpers.not_empty?
+
+          # Description is empty
+          q.responses[:not_valid] = "\nYour description cannot be empty. Please enter a valid description."
+      end
+    end
+
+    # Ask for a target date
+    def ask_for_target_date(question)
+      target_date = CLI.ask(question) do |q|
+        # Validate date
+        q.validate = Helpers.valid_date?
+
+        # Date should be a future date
+        q.responses[:not_valid] = "The date has to be later than today. Please enter a date in the future."
+
+        # Date should be in dd-mm-yyyy format
+        q.responses[:invalid_type] = "Please enter a valid date in dd-mn-yyyy format."
+      end
+      # Parse the date in dd-mm-yyyy
+      target_date = Date.strptime(target_date, "%d-%m-%Y")
+    end
+
     # Display the welcome screen
     def welcome_screen
       system "clear"
       puts "Welcome to SMART Goals!"
 
       # Ask for the user's name
-      @name = CLI.ask("\nWhat's your name?") do |n|
-        # Check if the user's name is empty
-        n.validate = Helpers.not_empty?
-
-        # Name is empty
-        n.responses[:not_valid] = "\nInvalid name. Please enter a valid name."
-      end
+      @name = ask_for_name("\nWhat's your name?")
 
       # Ask for the user's email
-      @email = CLI.ask("\nWhat is your email? This is where we will be sending you notifications.") do |q|
-        # Check if the user's email is valid
-        q.validate = Helpers.valid_email?
-        
-        # Email is not in the right format
-        q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
-      end
+      @email = ask_for_email("\nWhat is your email? This is where we will be sending you notifications.")
     end
 
     # Display the menu choices
@@ -85,14 +122,8 @@ module SmartGoals
       goal = Goal.new
       
       # Ask the user for his Goal but not to worry about it too much at this point
-      goal.description = CLI.ask("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n") do |q|
-          # Check if the description is empty
-          q.validate = Helpers.not_empty?
+      goal.description = ask_for_description("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
 
-          # Description is empty
-          q.responses[:not_valid] = "\nInvalid description. Please enter a valid description."
-      end
-      
       # The goal description has been set. Thank the user. Tell him more about the app.
       puts <<~MESSAGE
         
@@ -108,22 +139,11 @@ module SmartGoals
         Let's start out by setting an target date for achieving your goal. If you
         don't set a target date, your goal will just remain a fantasy. Setting a
         target date for your goal is important step in the SMART goal process.
+
       MESSAGE
       
-      # Ask the user for a target date
-      target_date = CLI.ask("\nPlease enter a target date (format: dd-mm-yyyy)") do |q|
-        # Validate date
-        q.validate = Helpers.valid_date?
-
-        # Date should be a future date
-        q.responses[:not_valid] = "Please enter a date in the future."
-
-        # Date should be in d-m-Y format
-        q.responses[:invalid_type] = "Please enter a valid date."
-      end
-
-      # Get the target date in d-m-Y format
-      goal.target_date = Date.strptime(target_date, "%d-%m-%Y")
+      # Ask the user for a target date in dd-mm-yyyy format
+      goal.target_date = ask_for_target_date("When would you like to achieve this Goal? (format: dd-mm-yyyy)")
 
       # Display the SMART words
       list_smart_words
@@ -169,50 +189,51 @@ module SmartGoals
     # Ask the user for the goal to be more specific
     def make_goal_specific(goal)
       system "clear"
-      puts <<~MESSAGE 
-        At the moment your goal is still very raw. You need your goal to be specific
+      puts <<~MESSAGE
+        At the moment your goal is still very raw. You need your goal to be SPECIFIC
         so you can have a better idea of what your end goal is. For example if your
         current goal is 'lose weight', it's not specific enough so you won't know
         exactly what you're working towards. A better goal is 'get to 12% body-fat in
         6 months'. And then to have a series of tasks to complete to get there.
         We will guide you through that later."
-      MESSAGE
-      description = CLI.ask("\nFor now, try and rewrite your goal so it meets this\nSMART criteria as best you can.\n\nDescribe your Goal:\n")  do |q|
-          # Check if the description is empty
-          q.validate = Helpers.not_empty?
 
-          # Description is empty
-          q.responses[:not_valid] = "\nInvalid description. Please enter a valid description."
-      end
-      goal.description = description #if description
+        For now, try and rewrite your goal. Make it more SPECIFIC so it meets the
+        SMART criteria as best you can.
+
+
+        The goal that you wrote:
+        #{goal.description}
+
+      MESSAGE
+      # Ask for a more specific goal description
+      goal.description = ask_for_description("Re-write your Goal to be more Specific:\n")
     end
 
     # Ask if the goal is Attainable
     def make_goal_attainable(goal)
       system "clear"
-      puts "\nIs your goal Attainable? Or is your goal too easy? Or it set at the right level?"
-      attainable = CLI.ask("\nPlease write out why you think your goal is set at the right level.") do |q|
-          # Check if the input is empty
-          q.validate = Helpers.not_empty?
+      puts <<~MESSAGE
+        Is your goal ATTAINABLE?
+        Is it too easy?
+        It set at the right level?
 
-          # Input is empty
-          q.responses[:not_valid] = "\nInvalid description. Please enter a valid Attainable description."
-      end
-      goal.attainable = attainable
+        Please write out why you think your goal is set at the right level.
+
+      MESSAGE
+      # Ask for an ATTAINABLE description
+      goal.attainable = ask_for_description("Describe how your Goal can be Attainable:\n")
     end
 
     # Ask if the goal is Relevant
     def make_goal_relevant(goal)
       system "clear"
-      puts "\nIs your goal Relevant? Why is this goal important to you?"
-      relevant = CLI.ask("\nPlease write out why you'd like to achieve this goal.") do |q|
-          # Check if the input is empty
-          q.validate = Helpers.not_empty?
+      puts <<~MESSAGE
+        Is your goal RELEVANT?
+        Why is this goal important to you?
 
-          # Input is empty
-          q.responses[:not_valid] = "\nInvalid description. Please enter a valid Relevant description."
-      end
-      goal.relevant = relevant
+      MESSAGE
+      # Ask for RELEVANT description
+      goal.relevant = ask_for_description("Please write out why you'd like to achieve this goal.\n\nDescribe how your Goal can be Relevant:\n")
     end
 
     # Ask for the user's friend's email address
@@ -223,22 +244,11 @@ module SmartGoals
 
         Goals that you're accountable to someone to achieve are much more likely to be met than
         those where there isn't external pressure.
+
       MESSAGE
-      @friend_name = CLI.ask("\nPlease enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")  do |q|
-          # Check if the friend's name is empty
-          q.validate = Helpers.not_empty?
 
-          # Friend name is empty
-          q.responses[:not_valid] = "\nInvalid name. Please enter your friend's valid name."
-      end
-      email = CLI.ask("\nPlease enter his/her email:") do |q|
-        # Check if the friend's email is empty
-        q.validate = Helpers.valid_email?
-
-        # Friend's email is not valid
-        q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
-      end
-      @friend_email = email
+      @friend_name = ask_for_name("Please enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.\n\nFriend's name:")
+      @friend_email = ask_for_email("\nPlease enter #{@friend_name}'s email:")
     end
 
     # Complete setting the goal
@@ -315,31 +325,12 @@ module SmartGoals
           # Display: Select which attribute to edit
           attribute = PROMPT.select("Select which attribute to edit", attributes)
           if attribute == :description  # User selects description
-            description = CLI.ask("Please enter new description") do |q|
-                # Check if the input is empty
-                q.validate = Helpers.not_empty?
-
-                # Input is empty
-                q.responses[:not_valid] = "\nInvalid description. Please enter a valid Attainable description."
-            end
-            goal.description = description
+            goal.description = ask_for_description("Please enter new description")
 
           elsif attribute == :target_date # User selects target date
             
-            # Ask the user for a new target date
-            target_date = CLI.ask("\nPlease enter a new target date (format: dd-mm-yyyy)") do |q|
-              # Validate date
-              q.validate = Helpers.valid_date?
-
-              # Date should be a future date
-              q.responses[:not_valid] = "Please enter a date in the future."
-
-              # Date should be in d-m-Y format
-              q.responses[:invalid_type] = "Please enter a valid date."
-            end
-
-            # Get the target date in d-m-Y format
-            goal.target_date = Date.strptime(target_date, "%d-%m-%Y")
+            # Ask the user for a new target date in dd-mm-yyyy format
+            goal.target_date = ask_for_target_date("\nPlease enter a new target date (format: dd-mm-yyyy)")
 
           elsif attribute == :back  # User decides to press back
             break
