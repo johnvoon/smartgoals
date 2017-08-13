@@ -190,6 +190,7 @@ module SmartGoals
 
     # Ask for the user's friend's email address
     def set_friend_email
+      system "clear"
       puts <<~MESSAGE        
         We will now go even further and implement steps that make achieving your goals virtually
         inevitable.

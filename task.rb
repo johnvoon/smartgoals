@@ -73,10 +73,10 @@ module SmartGoals
       # Set the reminder message
       scheduler.schedule_popup(user_message, self.target_date)
       
-      # Schedule a popup message
+      # Schedule an email message
       scheduler.schedule_email(GOALSETTER.email, user_email, self.target_date)
 
-      # Schedule an email message
+      # Schedule an email message for user's friend
       scheduler.schedule_email(GOALSETTER.friend_email, friend_email, self.target_date)
     end
   end
