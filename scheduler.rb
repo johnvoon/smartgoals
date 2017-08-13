@@ -18,10 +18,10 @@ module SmartGoals
     end
 
     # Schedule an email message
-    def schedule_email(email, message, notification_time)
+    def schedule_email(email_address, message, notification_time)
       email = Email.new
       @schedule.at notification_time.to_s do
-        email.send_email(email, message)
+        email.send_email(email_address, message)
         @schedule.shutdown
       end
     end
