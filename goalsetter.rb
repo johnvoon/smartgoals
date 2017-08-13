@@ -85,7 +85,13 @@ module SmartGoals
       goal = Goal.new
       
       # Ask the user for his Goal but not to worry about it too much at this point
-      goal.description = CLI.ask("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
+      goal.description = CLI.ask("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n") do |q|
+          # Check if the description is empty
+          q.validate = Helpers.not_empty?
+
+          # Description is empty
+          q.responses[:not_valid] = "\nInvalid description. Please enter a valid description."
+      end
       
       # The goal description has been set. Thank the user. Tell him more about the app.
       puts <<~MESSAGE
@@ -171,15 +177,27 @@ module SmartGoals
         6 months'. And then to have a series of tasks to complete to get there.
         We will guide you through that later."
       MESSAGE
-      description = CLI.ask("\nFor now, try and rewrite your goal so it meets this\nSMART criteria as best you can.\n\nDescribe your Goal:\n")
-      goal.description = description if description
+      description = CLI.ask("\nFor now, try and rewrite your goal so it meets this\nSMART criteria as best you can.\n\nDescribe your Goal:\n")  do |q|
+          # Check if the description is empty
+          q.validate = Helpers.not_empty?
+
+          # Description is empty
+          q.responses[:not_valid] = "\nInvalid description. Please enter a valid description."
+      end
+      goal.description = description #if description
     end
 
     # Ask if the goal is Attainable
     def make_goal_attainable(goal)
       system "clear"
       puts "\nIs your goal Attainable? Or is your goal too easy? Or it set at the right level?"
-      attainable = CLI.ask("\nPlease write out why you think your goal is set at the right level.")
+      attainable = CLI.ask("\nPlease write out why you think your goal is set at the right level.") do |q|
+          # Check if the input is empty
+          q.validate = Helpers.not_empty?
+
+          # Input is empty
+          q.responses[:not_valid] = "\nInvalid description. Please enter a valid Attainable description."
+      end
       goal.attainable = attainable
     end
 
@@ -187,7 +205,13 @@ module SmartGoals
     def make_goal_relevant(goal)
       system "clear"
       puts "\nIs your goal Relevant? Why is this goal important to you?"
-      relevant = CLI.ask("\nPlease write out why you'd like to achieve this goal.")
+      relevant = CLI.ask("\nPlease write out why you'd like to achieve this goal.") do |q|
+          # Check if the input is empty
+          q.validate = Helpers.not_empty?
+
+          # Input is empty
+          q.responses[:not_valid] = "\nInvalid description. Please enter a valid Relevant description."
+      end
       goal.relevant = relevant
     end
 
@@ -200,9 +224,18 @@ module SmartGoals
         Goals that you're accountable to someone to achieve are much more likely to be met than
         those where there isn't external pressure.
       MESSAGE
-      @friend_name = CLI.ask("\nPlease enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")
+      @friend_name = CLI.ask("\nPlease enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")  do |q|
+          # Check if the friend's name is empty
+          q.validate = Helpers.not_empty?
+
+          # Friend name is empty
+          q.responses[:not_valid] = "\nInvalid name. Please enter your friend's valid name."
+      end
       email = CLI.ask("\nPlease enter his/her email:") do |q|
+        # Check if the friend's email is empty
         q.validate = Helpers.valid_email?
+
+        # Friend's email is not valid
         q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
       end
       @friend_email = email
@@ -282,12 +315,31 @@ module SmartGoals
           # Display: Select which attribute to edit
           attribute = PROMPT.select("Select which attribute to edit", attributes)
           if attribute == :description  # User selects description
-            description = CLI.ask("Enter new description")
+            description = CLI.ask("Please enter new description") do |q|
+                # Check if the input is empty
+                q.validate = Helpers.not_empty?
+
+                # Input is empty
+                q.responses[:not_valid] = "\nInvalid description. Please enter a valid Attainable description."
+            end
             goal.description = description
 
           elsif attribute == :target_date # User selects target date
-            target_date = Date.strptime(CLI.ask("Enter new target date"), '%d-%m-%Y')
-            goal.target_date = target_date
+            
+            # Ask the user for a new target date
+            target_date = CLI.ask("\nPlease enter a new target date (format: dd-mm-yyyy)") do |q|
+              # Validate date
+              q.validate = Helpers.valid_date?
+
+              # Date should be a future date
+              q.responses[:not_valid] = "Please enter a date in the future."
+
+              # Date should be in d-m-Y format
+              q.responses[:invalid_type] = "Please enter a valid date."
+            end
+
+            # Get the target date in d-m-Y format
+            goal.target_date = Date.strptime(target_date, "%d-%m-%Y")
 
           elsif attribute == :back  # User decides to press back
             break
