@@ -8,7 +8,7 @@ module SmartGoals
     attr_accessor :tasks        # tasks       : Array of Task
     attr_accessor :attainable   # attainable  : String
     attr_accessor :relevant     # relevant    : String
-    attr_accessor :question     # question    : Question
+    attr_reader   :question     # question    : Question
     
     # How to describe it
     def initialize
