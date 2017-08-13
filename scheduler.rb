@@ -1,3 +1,4 @@
+# Purpose: To create a schedule
 module SmartGoals
   class Scheduler
     attr_accessor :schedule   # scheduler : Rufus::Scheduler

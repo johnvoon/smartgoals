@@ -1,4 +1,3 @@
-require 'pry'
 # Purpose: To Create Tasks
 module SmartGoals
   class Goal
@@ -9,11 +8,13 @@ module SmartGoals
     attr_accessor :tasks        # tasks       : Array of Task
     attr_accessor :attainable   # attainable  : String
     attr_accessor :relevant     # relevant    : String
-
+    attr_accessor :question     # question    : Question
+    
     # How to describe it
     def initialize
       @tasks = []
       @completed = false # Goal is set to "not completed" upon creation
+      @question = Question.new
     end
 
     # Add new task to list of tasks
@@ -45,6 +46,7 @@ module SmartGoals
         tasks
       )
 
+      # Return selected task
       selected_task
     end
 
@@ -94,7 +96,7 @@ module SmartGoals
       end
     end
 
-
+    # Create new tasks
     def create_tasks
       system "clear"
       puts <<~MESSAGE
@@ -107,18 +109,14 @@ module SmartGoals
           display_goal(self)
           display_tasks
           task = Task.new
-          task.description = CLI.ask("\nDescribe your task:")
+          task.description = @question.ask_for_description("\nDescribe your task:")
           task.frequency = get_frequency
           task.creation_date = Time.now.getlocal
 
           case task.frequency
             when :once
-              target_date = CLI.ask("\nWhen do you aim to complete this task by (dd-mm-yyyy)? Make sure your timeframe is realistic.") do |q|
-                q.validate = Helpers.valid_date?
-                q.responses[:not_valid] = "Please enter a date in the future."
-                q.responses[:invalid_type] = "Please enter a valid date in the format 'dd-mm-yyyy'."
-              end
-              task.target_date = Time.strptime(target_date, '%d-%m-Y')
+              task.target_date = @question.ask_for_target_date("\nWhen do you aim to complete this task by (dd-mm-yyyy)? Make sure your timeframe is realistic.")
+
             else
               task.target_date = Helpers.calculate_task_target_date(
                 task.creation_date,
@@ -140,6 +138,7 @@ module SmartGoals
       end
     end
 
+    # Schedule a recurring task
     def schedule_recurring_task_creation(task)
       scheduler = Rufus::Scheduler.new
       scheduler.every "#{Helpers.convert_frequency_to_seconds(task.frequency).to_s}s" do
@@ -159,6 +158,7 @@ module SmartGoals
       end
     end
 
+    # Displays the Task Management Menu
     def display_task_management_menu
       loop do
         system "clear"
@@ -171,20 +171,21 @@ module SmartGoals
         end
 
         case choice
-        when '1'
-          create_tasks
-        when '2'
-          edit_task
-        when '3'
-          delete_task
-        when '4'
-          mark_task_complete
-        when '5'
-          break
+          when '1'
+            create_tasks
+          when '2'
+            edit_task
+          when '3'
+            delete_task
+          when '4'
+            mark_task_complete
+          when '5'
+            break
         end
       end
     end
 
+    # Prompt for choice on Task Management Menu and Selects that Choice
     def get_task_choice(operation)
       system "clear"
       if @tasks.empty?
@@ -193,18 +194,21 @@ module SmartGoals
           create_tasks
         end
       else
-      tasks = {}
-      @tasks.each_with_index { |task, index| tasks["#{index + 1}. #{task.description}"] = task }
-      task = PROMPT.select("Select a task to #{operation}:", tasks)
+        tasks = {}
+        @tasks.each_with_index { |task, index| tasks["#{index + 1}. #{task.description}"] = task }
+        task = PROMPT.select("Select a task to #{operation}:", tasks)
       end
+      # Return task choice
       task
     end
 
+    # View selected task
     def view_tasks
       puts "View Tasks"
       get_task_choice("view")
     end
 
+    # Edit selected task
     def edit_task
       system "clear"
       task = get_task_choice("edit")
@@ -220,14 +224,7 @@ module SmartGoals
           }
           attribute = PROMPT.select("Select which task attribute to edit", attributes)
           if attribute == :description
-            description = CLI.ask("Enter new description") do |q|
-                # Check if the description is empty
-                q.validate = Helpers.not_empty?
-        
-                # Description is empty
-                q.responses[:not_valid] = "\nInvalid description. Please enter a valid description."
-            end
-            task.description = description
+            task.description = @questions.ask_for_description("Enter new description")
           elsif attribute == :frequency
             frequency = get_frequency
             task.frequency = frequency
@@ -241,6 +238,7 @@ module SmartGoals
       end
     end
 
+    # Delete selected task
     def delete_task
       system "clear"
       loop do
@@ -256,6 +254,7 @@ module SmartGoals
       end
     end
 
+    # Mark task as complete
     def mark_task_complete
       system "clear"
       loop do

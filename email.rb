@@ -1,3 +1,4 @@
+# Purpose: To send an email
 module SmartGoals
     class Email
         # Send an email message

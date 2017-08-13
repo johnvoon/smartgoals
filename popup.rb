@@ -1,3 +1,4 @@
+# Purpose: To send a popup message
 module SmartGoals
     class Popup
         # Send a popup message
@@ -11,9 +12,8 @@ module SmartGoals
             elsif OS.windows?
                 # TODO
                 # If windows
-                
-            end
 
+            end
         end
     end
 end

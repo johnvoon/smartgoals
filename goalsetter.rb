@@ -7,10 +7,12 @@ module SmartGoals
     attr_accessor :friend_name  # friend_name : String
     attr_accessor :friend_email # friend_email :  String
     attr_accessor :goals        # goals : Array of Goal
+    attr_reader   :question     # question: Questions
 
     # How to describe it
     def initialize
       @goals = []
+      @question = Question.new
     end
 
     # Start the app and display the menu
@@ -20,56 +22,7 @@ module SmartGoals
 
       # Display user menu choices
       get_goal_management_choice
-    end
-
-    # Ask for a name
-    def ask_for_name(question)
-      name = CLI.ask(question)  do |q|
-          # Check if the friend's name is empty
-          q.validate = Helpers.not_empty?
-
-          # Friend name is empty
-          q.responses[:not_valid] = "\The name cannot be empty. Please enter a valid name."
-      end
-    end
-
-    # Ask for an email address
-    def ask_for_email(question)
-      email = CLI.ask(question) do |q|
-        # Check if the friend's email is empty
-        q.validate = Helpers.valid_email?
-
-        # Email is not valid
-        q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email. (e.g. someone@example.com)"
-      end
-    end
-
-    # Ask for a description
-    def ask_for_description(question)
-      description = CLI.ask(question) do |q|
-          # Check if the description is empty
-          q.validate = Helpers.not_empty?
-
-          # Description is empty
-          q.responses[:not_valid] = "\nYour description cannot be empty. Please enter a valid description."
-      end
-    end
-
-    # Ask for a target date
-    def ask_for_target_date(question)
-      target_date = CLI.ask(question) do |q|
-        # Validate date
-        q.validate = Helpers.valid_date?
-
-        # Date should be a future date
-        q.responses[:not_valid] = "The date has to be later than today. Please enter a date in the future."
-
-        # Date should be in dd-mm-yyyy format
-        q.responses[:invalid_type] = "Please enter a valid date in dd-mn-yyyy format."
-      end
-      # Parse the date in dd-mm-yyyy
-      target_date = Date.strptime(target_date, "%d-%m-%Y")
-    end
+    end    
 
     # Display the welcome screen
     def welcome_screen
@@ -77,10 +30,10 @@ module SmartGoals
       puts "Welcome to SMART Goals!"
 
       # Ask for the user's name
-      @name = ask_for_name("\nWhat's your name?")
+      @name = @question.ask_for_name("\nWhat's your name?")
 
       # Ask for the user's email
-      @email = ask_for_email("\nWhat is your email? This is where we will be sending you notifications.")
+      @email = @question.ask_for_email("\nWhat is your email? This is where we will be sending you notifications.")
     end
 
     # Display the menu choices
@@ -121,7 +74,7 @@ module SmartGoals
       goal = Goal.new
       
       # Ask the user for his Goal but not to worry about it too much at this point
-      goal.description = ask_for_description("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
+      goal.description = @question.ask_for_description("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
 
       # The goal description has been set. Thank the user. Tell him more about the app.
       puts <<~MESSAGE
@@ -142,7 +95,7 @@ module SmartGoals
       MESSAGE
       
       # Ask the user for a target date in dd-mm-yyyy format
-      goal.target_date = ask_for_target_date("When would you like to achieve this Goal? (format: dd-mm-yyyy)")
+      goal.target_date = @question.ask_for_target_date("When would you like to achieve this Goal? (format: dd-mm-yyyy)")
 
       # Display the SMART words
       list_smart_words
@@ -205,7 +158,7 @@ module SmartGoals
 
       MESSAGE
       # Ask for a more specific goal description
-      goal.description = ask_for_description("Re-write your Goal to be more Specific:\n")
+      goal.description = @question.ask_for_description("Re-write your Goal to be more Specific:\n")
     end
 
     # Ask if the goal is Attainable
@@ -220,7 +173,7 @@ module SmartGoals
 
       MESSAGE
       # Ask for an ATTAINABLE description
-      goal.attainable = ask_for_description("Describe how your Goal can be Attainable:\n")
+      goal.attainable = @question.ask_for_description("Describe how your Goal can be Attainable:\n")
     end
 
     # Ask if the goal is Relevant
@@ -232,7 +185,7 @@ module SmartGoals
 
       MESSAGE
       # Ask for RELEVANT description
-      goal.relevant = ask_for_description("Please write out why you'd like to achieve this goal.\n\nDescribe how your Goal can be Relevant:\n")
+      goal.relevant = @question.ask_for_description("Please write out why you'd like to achieve this goal.\n\nDescribe how your Goal can be Relevant:\n")
     end
 
     # Ask for the user's friend's email address
@@ -246,8 +199,8 @@ module SmartGoals
 
       MESSAGE
 
-      @friend_name = ask_for_name("Please enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.\n\nFriend's name:")
-      @friend_email = ask_for_email("\nPlease enter #{@friend_name}'s email:")
+      @friend_name = @question.ask_for_name("Please enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.\n\nFriend's name:")
+      @friend_email = @question.ask_for_email("\nPlease enter #{@friend_name}'s email:")
     end
 
     # Complete setting the goal
@@ -324,12 +277,12 @@ module SmartGoals
           # Display: Select which attribute to edit
           attribute = PROMPT.select("Select which attribute to edit", attributes)
           if attribute == :description  # User selects description
-            goal.description = ask_for_description("Please enter new description")
+            goal.description = @question.ask_for_description("Please enter new description")
 
           elsif attribute == :target_date # User selects target date
             
             # Ask the user for a new target date in dd-mm-yyyy format
-            goal.target_date = ask_for_target_date("\nPlease enter a new target date (format: dd-mm-yyyy)")
+            goal.target_date = @question.ask_for_target_date("\nPlease enter a new target date (format: dd-mm-yyyy)")
 
           elsif attribute == :back  # User decides to press back
             break

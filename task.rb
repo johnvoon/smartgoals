@@ -14,26 +14,37 @@ module SmartGoals
 
     # How to describe it
     def initialize
-      @status = :todo # Status is set to a "todo" upon creation
+      @status = :todo # Default status is set to :todo
     end
 
     # Create a scheduled reminder
     def create_reminder_notification
       scheduler = Scheduler.new
+      # Calculate remainder time
       reminder_time = case self.frequency
                       when :every_minute then self.target_date - 30
                       when :hourly then self.target_date - (60 * 30)
                       else self.target_date - (60 * 60 * 24)
                       end
+      
+      # Set the reminder message
       message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{@description}"
+
+      # Schedule a popup message
       scheduler.schedule_popup(message, reminder_time)
+
+      # Schedule an email message
       scheduler.schedule_email(GOALSETTER.email, message, reminder_time)
     end
 
     # Create a scheduled fail notification
     def create_failed_notification
       scheduler = Scheduler.new
+      
+      # Set the failed message
       user_message = "Hey #{GOALSETTER.name}, You did not #{@description} today."
+
+      # Set the failed email message
       user_email = <<~MESSAGE
         Hey #{GOALSETTER.name}, 
         
@@ -43,6 +54,8 @@ module SmartGoals
         
         The Smart Goals Team        
       MESSAGE
+
+      # Set the failed email message for user's friend
       friend_email = <<~MESSAGE
         Hey #{GOALSETTER.friend_name}, 
         
@@ -57,8 +70,13 @@ module SmartGoals
         The Smart Goals Team
       MESSAGE
 
+      # Set the reminder message
       scheduler.schedule_popup(user_message, @target_date)
+      
+      # Schedule a popup message
       scheduler.schedule_email(GOALSETTER.email, user_email, @target_date)
+
+      # Schedule an email message
       scheduler.schedule_email(GOALSETTER.friend_email, friend_email, @target_date)
     end
   end

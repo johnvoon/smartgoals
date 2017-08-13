@@ -9,6 +9,7 @@ require 'concurrent'      # Gem that provides thread safe concurrency
 require 'mail'            # Gem to create e-mail messages
 
 require_relative 'helpers'    # Class which provides our validation rules, calculation and convertion
+require_relative 'question'   # Class which provides common questions and validate answers
 require_relative 'goalsetter' # Class which runs our app and drives the menu
 require_relative 'goal'       # Class which creates tasks
 require_relative 'task'       # Class which contains the details of the tasks and creates a notification service
