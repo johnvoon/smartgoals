@@ -3,15 +3,12 @@ require 'pry'
 module SmartGoals
   class Goal
     # What it has
-    # description : String
-    # completed : Boolean
-    # sub_goals : Array of SubGoal
-    attr_accessor :description
-    attr_accessor :target_date
-    attr_accessor :completed
-    attr_accessor :tasks
-    attr_accessor :attainable
-    attr_accessor :relevant
+    attr_accessor :description  # description : String
+    attr_accessor :target_date  # target_date : Time
+    attr_accessor :completed    # completed   : Boolean
+    attr_accessor :tasks        # tasks       : Array of Task
+    attr_accessor :attainable   # attainable  : String
+    attr_accessor :relevant     # relevant    : String
 
     # How to describe it
     def initialize
@@ -19,6 +16,7 @@ module SmartGoals
       @completed = false # Goal is set to "not completed" upon creation
     end
 
+    # What can it do
     # Add new task to list of tasks
     def add_task(task)
       @tasks << task
@@ -32,11 +30,17 @@ module SmartGoals
       end
     end
 
-    # Display task options
-    def display_task_options(selected_operation)
-      # selected_operation: String
+    # Display list of tasks for Prompt
+    def display_task_options(selected_operation) # selected_operation: String
+      # Create new hash for tasks
       tasks = {}
-      @tasks.each_with_index { |task, index| goals["#{index + 1}. #{task.description}"] = "#{index + 1}"}
+
+      # Display list of goals
+      @tasks.each_with_index do |task, index|
+        goals["#{index + 1}. #{task.description}"] = "#{index + 1}"
+      end
+
+      # Prompt user to select a task
       selected_task = SmartGoals::PROMPT.select(
         "Select a task to #{selected_operation}?",
         tasks
@@ -45,11 +49,15 @@ module SmartGoals
       selected_task
     end
 
+    # Display list of tasks for Terminal Table
     def display_tasks
+      # Create rows array
       rows = []
 
+      # Check if tasks were created
       if !@tasks.empty?
         @tasks.each_with_index do |task, index|
+          # Append tasks to rows array
           rows << [
             (index + 1).to_s,
             task.description,
@@ -58,19 +66,23 @@ module SmartGoals
           ]
         end
       else
+        # No tasks were created. Just display "No tasks added yet"
         rows << ["", "No tasks added yet"]
       end
 
+      # Create terminal table for tasks
       table = Terminal::Table.new(
         title: "Your Tasks",
         headings: ['No.', 'Description', 'Recurring', 'Target Date'],
         rows: rows
       )
 
+      # Display terminal table
       puts ""
       puts table
     end
 
+    # Display prompt for frequency
     def get_frequency
       PROMPT.select("\nHow often would you like to do this task?") do |menu|
         menu.choice 'Just once', :once
@@ -83,9 +95,14 @@ module SmartGoals
       end
     end
 
+
     def create_tasks
       system "clear"
-      puts "\nAt the moment your goal is still too big and daunting to be achieved. So we will need to break your goal down into a series of tasks. Make sure these tasks also meet the SMART criteria."
+      puts <<~MESSAGE
+        At the moment your goal is still too big and daunting to be achieved.
+        So we will need to break your goal down into a series of tasks.
+        Make sure these tasks also meet the SMART criteria.
+      MESSAGE
       if CLI.agree("\nWould you like to set these tasks now? (y/n)")
         loop do
           display_goal(self)
@@ -96,19 +113,19 @@ module SmartGoals
           task.creation_date = Time.now.getlocal
 
           case task.frequency
-          when :once
-            target_date = CLI.ask("\nWhen do you aim to complete this task by (dd-mm-yyyy)? Make sure your timeframe is realistic.") do |q|
-              q.validate = Helpers.valid_date?
-              q.responses[:not_valid] = "Please enter a date in the future."
-              q.responses[:invalid_type] = "Please enter a valid date in the format 'dd-mm-yyyy'."
-            end
-            task.target_date = Time.strptime(target_date, '%d-%m-Y')
-          else
-            task.target_date = Helpers.calculate_task_target_date(
-              task.creation_date,
-              task.frequency
-            )
-            schedule_recurring_task_creation(task)
+            when :once
+              target_date = CLI.ask("\nWhen do you aim to complete this task by (dd-mm-yyyy)? Make sure your timeframe is realistic.") do |q|
+                q.validate = Helpers.valid_date?
+                q.responses[:not_valid] = "Please enter a date in the future."
+                q.responses[:invalid_type] = "Please enter a valid date in the format 'dd-mm-yyyy'."
+              end
+              task.target_date = Time.strptime(target_date, '%d-%m-Y')
+            else
+              task.target_date = Helpers.calculate_task_target_date(
+                task.creation_date,
+                task.frequency
+              )
+              schedule_recurring_task_creation(task)
           end
 
           add_task(task)
@@ -192,25 +209,36 @@ module SmartGoals
     def edit_task
       system "clear"
       task = get_task_choice("edit")
-      loop do
-        system "clear"
 
-        attributes = {
-          "Description: #{task.description}": :description,
-          "Frequency: #{task.frequency}": :frequency,
-          "Back": :back
-        }
-        attribute = PROMPT.select("Select which task attribute to edit", attributes)
-        if attribute == :description
-          description = CLI.ask("Enter new description")
-          task.description = description
-        elsif attribute == :frequency
-          frequency = get_frequency
-          task.frequency = frequency
-        elsif attribute == :back
-          break
+      # If task was set
+      if !task.nil?
+        loop do
+          system "clear"
+          attributes = {
+            "Description: #{task.description}": :description,
+            "Frequency: #{task.frequency}": :frequency,
+            "Back": :back
+          }
+          attribute = PROMPT.select("Select which task attribute to edit", attributes)
+          if attribute == :description
+            description = CLI.ask("Enter new description") do |q|
+                # Check if the description is empty
+                q.validate = Helpers.not_empty?
+        
+                # Description is empty
+                q.responses[:not_valid] = "\nInvalid description. Please enter a valid description."
+            end
+            task.description = description
+          elsif attribute == :frequency
+            frequency = get_frequency
+            task.frequency = frequency
+          elsif attribute == :back
+            break
+          end
+          break unless CLI.agree("Edit another attribute? (y/n)")
         end
-        break unless CLI.agree("Edit another attribute? (y/n)")
+      else
+        # Just go back to menu
       end
     end
 
@@ -218,8 +246,14 @@ module SmartGoals
       system "clear"
       loop do
         task = get_task_choice("delete")
-        @tasks.delete(task)
-        break unless CLI.agree("Delete another task? (y/n)")
+        # If task was set
+        if !task.nil?
+          @tasks.delete(task)
+          break unless CLI.agree("Delete another task? (y/n)")
+        else
+          # Just go back to menu
+          break
+        end
       end
     end
 
@@ -227,16 +261,17 @@ module SmartGoals
       system "clear"
       loop do
         task = get_task_choice("mark complete")
-        task.status = :completed
-        puts "Congratulations on completing this task!"
-        break unless CLI.agree("Mark another task complete? (y/n)")
+        # If task was set
+        if !task.nil?
+          task.status = :completed
+          puts "Congratulations on completing this task!"
+          break unless CLI.agree("Mark another task complete? (y/n)")
+        else
+          # Just go back to menu
+          break
+        end
       end
     end
 
-    # What can it do
-    # TODO
-    # add_task(task_id)
-    # remove_task(task_id)
-    # task_complete(task_id)
   end
 end

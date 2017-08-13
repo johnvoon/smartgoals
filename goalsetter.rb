@@ -2,11 +2,11 @@
 module SmartGoals
   class GoalSetter
     # What it has
-    attr_accessor :name         # name:  String
-    attr_accessor :email        # email: String
-    attr_accessor :friend_name  # friend name:   String
-    attr_accessor :friend_email # friend email:  String
-    attr_accessor :goals        # goal:  Array of Goal
+    attr_accessor :name         # name : String
+    attr_accessor :email        # email : String
+    attr_accessor :friend_name  # friend_name : String
+    attr_accessor :friend_email # friend_email :  String
+    attr_accessor :goals        # goals : Array of Goal
 
     # How to describe it
     def initialize
@@ -200,7 +200,7 @@ module SmartGoals
         Goals that you're accountable to someone to achieve are much more likely to be met than
         those where there isn't external pressure.
       MESSAGE
-      @friend_name = CLI.ask("\nPlease enter the email of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")
+      @friend_name = CLI.ask("\nPlease enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")
       email = CLI.ask("\nPlease enter his/her email:") do |q|
         q.validate = Helpers.valid_email?
         q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
@@ -281,17 +281,18 @@ module SmartGoals
           }
           # Display: Select which attribute to edit
           attribute = PROMPT.select("Select which attribute to edit", attributes)
-          if attribute == :description
+          if attribute == :description  # User selects description
             description = CLI.ask("Enter new description")
             goal.description = description
 
-          elsif attribute == :target_date
+          elsif attribute == :target_date # User selects target date
             target_date = Date.strptime(CLI.ask("Enter new target date"), '%d-%m-%Y')
             goal.target_date = target_date
 
-          elsif attribute == :back
+          elsif attribute == :back  # User decides to press back
             break
           end
+
           # Edit another attribute, otherwise go back to main menu
           break unless CLI.agree("Edit another attribute? (y/n)")
         end
