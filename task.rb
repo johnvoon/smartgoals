@@ -28,7 +28,7 @@ module SmartGoals
                       end
       
       # Set the reminder message
-      message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{@description}"
+      message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{self.description}"
 
       # Schedule a popup message
       scheduler.schedule_popup(message, reminder_time)
@@ -42,13 +42,13 @@ module SmartGoals
       scheduler = Scheduler.new
       
       # Set the failed message
-      user_message = "Hey #{GOALSETTER.name}, You did not #{@description} today."
+      user_message = "Hey #{GOALSETTER.name}, You did not #{self.description} today."
 
       # Set the failed email message
       user_email = <<~MESSAGE
         Hey #{GOALSETTER.name}, 
         
-        You did not #{@description} today to achieve your goal: . 
+        You did not #{self.description} today to achieve your goal: . 
         
         If you want to achieve your goal, you'll need to take steps to get there. Keep going!
         
@@ -63,7 +63,7 @@ module SmartGoals
 
         He/she told us to notify you on failing to do a task to meet this goal. 
         
-        Let them know they're failing at this task: #{@description}.
+        Let them know they're failing at this task: #{self.description}.
 
         Thanks.
 
@@ -71,13 +71,13 @@ module SmartGoals
       MESSAGE
 
       # Set the reminder message
-      scheduler.schedule_popup(user_message, @target_date)
+      scheduler.schedule_popup(user_message, self.target_date)
       
       # Schedule a popup message
-      scheduler.schedule_email(GOALSETTER.email, user_email, @target_date)
+      scheduler.schedule_email(GOALSETTER.email, user_email, self.target_date)
 
       # Schedule an email message
-      scheduler.schedule_email(GOALSETTER.friend_email, friend_email, @target_date)
+      scheduler.schedule_email(GOALSETTER.friend_email, friend_email, self.target_date)
     end
   end
 end

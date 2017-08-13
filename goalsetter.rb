@@ -42,7 +42,7 @@ module SmartGoals
         system "clear"
 
         # Make the user feel welcome
-        puts "\nHi #{@name}! We will be guiding you through the process of setting SMART goals."
+        puts "\nHi #{self.name}! We will be guiding you through the process of setting SMART goals."
         
         # Ask the user for a menu choice
         choice = PROMPT.select("\nIf you are new user, select 'Create a SMART Goal'.") do |menu|
@@ -200,7 +200,7 @@ module SmartGoals
       MESSAGE
 
       @friend_name = @question.ask_for_name("Please enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.\n\nFriend's name:")
-      @friend_email = @question.ask_for_email("\nPlease enter #{@friend_name}'s email:")
+      @friend_email = @question.ask_for_email("\nPlease enter #{self.friend_name}'s email:")
     end
 
     # Complete setting the goal
