@@ -13,7 +13,6 @@ module SmartGoals
       @goals = []
     end
 
-    # What can it do
     # Start the app and display the menu
     def run_program
       # Display welcome screen

@@ -17,12 +17,11 @@ module SmartGoals
       @status = :todo # Status is set to a "todo" upon creation
     end
 
-    # What can it do
     # TODO
     # send_message - reminder, notification, encouragement
 
     def create_reminder_notification
-      notification_service = NotificationService.new
+      notification_service = Scheduler.new
       reminder_time = case self.frequency
                       when :every_minute then self.target_date - 30
                       when :hourly then self.target_date - (60 * 30)
@@ -34,7 +33,7 @@ module SmartGoals
     end
 
     def create_failed_notification
-      notification_service = NotificationService.new
+      notification_service = Scheduler.new
       user_message = "Hey #{GOALSETTER.name}, You did not #{@description} today."
       user_email = <<~MESSAGE
         Hey #{GOALSETTER.name}, 

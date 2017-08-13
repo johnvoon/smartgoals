@@ -16,7 +16,6 @@ module SmartGoals
       @completed = false # Goal is set to "not completed" upon creation
     end
 
-    # What can it do
     # Add new task to list of tasks
     def add_task(task)
       @tasks << task

@@ -12,7 +12,9 @@ require_relative 'helpers'    # Class which provides our validation rules, calcu
 require_relative 'goalsetter' # Class which runs our app and drives the menu
 require_relative 'goal'       # Class which creates tasks
 require_relative 'task'       # Class which contains the details of the tasks and creates a notification service
-require_relative 'notification_service' # Class which creates the scheduled popup messages and email messages
+require_relative 'scheduler'  # Class which creates the scheduled popup messages and email messages
+require_relative 'popup'      # Class which sends popup messages to the user
+require_relative 'email'      # Class which sends email messages to the user
 
 # People need a SMART Goal Setter because they have Goals.
 # In every Goal, there are Tasks that need to be achieved/completed.
