@@ -1,4 +1,12 @@
 # Purpose: To contain the attributes of the tasks
+# Usage:
+#   t = SmartGoals::Task.new
+#   t.frequency = :every_minute
+#   t.description = 'Learn Ruby'
+#   t.target_time = Time.parse('2017/08/11 16:20:00 +10:00')
+#   t.create_reminder_notification
+#   t.create_failed_notification]
+
 module SmartGoals
   class Task
     # What it has
