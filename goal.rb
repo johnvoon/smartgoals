@@ -69,7 +69,7 @@ module SmartGoals
             (index + 1).to_s.colorize(generate_color(status)),
             task.description.colorize(generate_color(status)),
             task.frequency.to_s.gsub('_', ' ').capitalize.colorize(generate_color(status)),
-            task.target_date ? task.target_date.strftime("%d/%m/%Y").colorize(generate_color(status)) : ""
+            task.target_date ? task.target_date.strftime("%d/%m/%Y %I:%M %p").colorize(generate_color(status)) : ""
           ] if task.status == status
         end
       else
@@ -80,7 +80,7 @@ module SmartGoals
       # Create terminal table for tasks
       tasks = Terminal::Table.new(
         title: table_title,
-        headings: ['No.', 'Description', 'Recurring', 'Target Date'],
+        headings: ['No.', 'Description', 'Recurring', 'Target Date/Time'],
         rows: rows
       )
 
