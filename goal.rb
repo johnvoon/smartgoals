@@ -1,4 +1,3 @@
-require 'pry'
 # Purpose: To Create Tasks
 module SmartGoals
   class Goal
@@ -46,7 +45,7 @@ module SmartGoals
 
     # Display list of tasks for Terminal Table
     def display_tasks(status)
-          
+
       # Create rows array
       rows = []
       table_title =
@@ -202,7 +201,7 @@ module SmartGoals
             todo_tasks["#{index + 1}. #{task.description}"] = task
           end
         todo_tasks["#{todo_tasks.length + 1}. Back"] = :back
-        
+
         task = PROMPT.select("Select a task to #{operation}:", todo_tasks)
       end
       # Return task choice
@@ -235,13 +234,13 @@ module SmartGoals
           elsif attribute == :frequency
             frequency = get_frequency
             task.frequency = frequency
-          
+
             recurring_scheduler_first =
               @recurring_schedulers
                 .select {|scheduler| scheduler.id == task.recurring_scheduler_id }
                 .first
             recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first
-            
+
             schedule_recurring_task_creation(task)
           elsif attribute == :back
             break
@@ -255,7 +254,6 @@ module SmartGoals
     def delete_task
       system "clear"
       loop do
-        binding.pry
         task = get_task_choice("delete")
         # If task was set
         if task && task != :back
@@ -277,24 +275,27 @@ module SmartGoals
     # Mark task as complete
     def mark_task_complete
       system "clear"
+      # If task was set
+
       loop do
         task = get_task_choice("mark complete")
-        task.status = :completed
-
-        # Cancel notifications 
-        task.cancel_reminder_notification
-        task.cancel_failed_notification
-        
-          puts "Congratulations on completing this task!"
-        break unless CLI.agree("Mark another task complete? (y/n)")
-        # If task was set
         if task && task != :back
           task.status = :completed
+
+          system "clear"
+          display_tasks(:completed)
+          display_tasks(:failed)
+
+          # Cancel notifications
+          task.cancel_reminder_notification
+          task.cancel_failed_notification
+
           puts "Congratulations on completing this task!"
           break unless CLI.agree("Mark another task complete? (y/n)")
+        else
+          break
         end
       end
     end
-
   end
 end

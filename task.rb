@@ -73,7 +73,7 @@ module SmartGoals
       MESSAGE
       
       # Set the color change to red for failure
-      @failed_scheduler.schedule_color_change_by_status(@target_date, self, :failed)
+      # @failed_scheduler.schedule_color_change_by_status(@target_date, self, :failed)
 
       # Set the reminder message
       @failed_scheduler.schedule_popup(user_message, self.target_date)
