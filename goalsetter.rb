@@ -73,7 +73,7 @@ module SmartGoals
       system "clear"
       if CLI.agree("Create a new goal? (y/n)")
         goal = Goal.new
-        
+
         # Ask the user for his Goal but not to worry about it too much at this point
         goal.description = @question.ask_for_description("\nPlease tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
 
@@ -112,12 +112,29 @@ module SmartGoals
         # Display: Ask the user for his friend's email
         set_friend_email
 
+        system "clear"
+        puts <<~MESSAGE
+
+          At the moment your goal is still too big and daunting 
+          to be achieved. So we will need to break your goal 
+          down into a series of tasks.
+          
+          Make sure these tasks also meet the SMART criteria.
+        MESSAGE
+
+        CLI.ask("\nPress enter to continue.")
+
         # Display: Create the tasks
-        goal.create_tasks
+        if CLI.agree("\nDo you want to set tasks now (y/n)?")
+          goal.create_tasks
+          finish_setting_goal
+        else
+          finish_setting_goal_without_tasks
+        end
+
         @goals << goal
 
         # Display: Complete setting the goal
-        finish_setting_goal
       end
     end
 
@@ -154,8 +171,6 @@ module SmartGoals
         For example, a goal 'to lose weight' is not specific enough.
 
         A better goal would be 'get to 12% body-fat in 6 months'.
-
-        Try and rewrite your goal so it's more SPECIFIC.
       MESSAGE
       # Ask for a more specific goal description
       goal.description = @question.ask_for_description("\nRe-write your Goal to be more Specific:\n")
@@ -223,7 +238,22 @@ module SmartGoals
       MESSAGE
 
       # Press enter to finish
-      CLI.ask("\nPress enter to finish.")
+      CLI.ask("\nPlease press enter to finish.")
+    end
+
+    # Complete setting the goal without tasks
+    def finish_setting_goal_without_tasks
+      system "clear"
+
+      # Tell the user they did a good job
+      puts <<~MESSAGE
+
+        Good job on turning your goal into a SMART goal!
+        However, you have 1 more step to go: Setting your tasks!
+      MESSAGE
+
+      # Press enter to finish
+      CLI.ask("\nPress enter to go back to the main menu.")
     end
 
     # Display list of goals
@@ -258,7 +288,7 @@ module SmartGoals
       goal = display_goals("view")
 
       # If goal was set
-      if goal && goal != :back 
+      if goal && goal != :back
         goal.display_task_management_menu # Display task management menu
       end
     end

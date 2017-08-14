@@ -88,14 +88,7 @@ module SmartGoals
     # Create new tasks
     def create_tasks
       system "clear"
-      puts <<~MESSAGE
-        At the moment your goal is still too big and daunting 
-        to be achieved. So we will need to break your goal 
-        down into a series of tasks.
-        
-        Make sure these tasks also meet the SMART criteria.
-      MESSAGE
-      if CLI.agree("\nWould you like to set these tasks now? (y/n)")
+      if CLI.agree("\nWould you like to set tasks now? (y/n)")
         loop do
           display_goal(self)
           display_tasks(:todo)
@@ -276,10 +269,8 @@ module SmartGoals
         task = get_task_choice("mark complete")
         task.status = :completed
         task.status_color = task.status
-        if task.frequency == :once
-          task.cancel_reminder_notification
-          task.cancel_failed_notification
-        end
+        task.cancel_reminder_notification
+        task.cancel_failed_notification
         puts "Congratulations on completing this task!"
         break unless CLI.agree("Mark another task complete? (y/n)")
         # If task was set
