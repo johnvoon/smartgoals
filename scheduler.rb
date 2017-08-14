@@ -8,6 +8,15 @@ module SmartGoals
       @schedule = Rufus::Scheduler.new
     end
 
+    # Schedule a color change
+    def schedule_color_change_by_status(notification_time, parent_task, status)
+      task = parent_task
+      @schedule.at notification_time.to_s do
+        task.status_color = status
+        @schedule.shutdown
+      end
+    end
+
     # Schedule a popup message
     def schedule_popup(message, notification_time)
       popup = Popup.new
@@ -25,5 +34,6 @@ module SmartGoals
         @schedule.shutdown
       end
     end
+    
   end
 end

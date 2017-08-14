@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# README.mdrequire 'pry'
-=======
->>>>>>> 9802c1b4477b5f5d1b8430511d1eb52e9b154d21
 # Purpose: To Create Tasks
 module SmartGoals
   class Goal
