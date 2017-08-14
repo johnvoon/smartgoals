@@ -216,7 +216,7 @@ module SmartGoals
       task = get_task_choice("edit")
 
       # If task was set
-      if task != :back
+      if task && task != :back
         loop do
           system "clear"
           attributes = {
@@ -253,7 +253,7 @@ module SmartGoals
         binding.pry
         task = get_task_choice("delete")
         # If task was set
-        if task != :back
+        if task && task != :back
           @tasks.delete(task)
           # If recurring scheduler set, shut it down
           recurring_scheduler_first =
@@ -283,13 +283,10 @@ module SmartGoals
         puts "Congratulations on completing this task!"
         break unless CLI.agree("Mark another task complete? (y/n)")
         # If task was set
-        if !task.nil?
+        if task && task != :back
           task.status = :completed
           puts "Congratulations on completing this task!"
           break unless CLI.agree("Mark another task complete? (y/n)")
-        else
-          # Just go back to menu
-          break
         end
       end
     end
