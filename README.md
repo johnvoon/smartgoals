@@ -20,3 +20,9 @@
 - Incorporate mail gem
 - File storage
 - UI/UX Improvements
+
+## To present
+- Create a Goal
+- Add One Off Task
+- Add Recurring Task
+- Edit Goal

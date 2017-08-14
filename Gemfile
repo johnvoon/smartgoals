@@ -8,6 +8,7 @@ gem 'os'
 gem 'rufus-scheduler'
 gem 'tty-prompt'
 gem 'terminal-table'
-gem 'concurrent-ruby'
+gem 'colorize'
+gem 'terminal-notifier'
 
 

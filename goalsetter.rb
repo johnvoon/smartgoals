@@ -22,7 +22,7 @@ module SmartGoals
 
       # Display user menu choices
       get_goal_management_choice
-    end    
+    end
 
     # Display the welcome screen
     def welcome_screen
@@ -43,7 +43,7 @@ module SmartGoals
 
         # Make the user feel welcome
         puts "\nHi #{self.name}! We will be guiding you through the process of setting SMART goals."
-        
+
         # Ask the user for a menu choice
         choice = PROMPT.select("\nIf you are new user, select 'Create a SMART Goal'.") do |menu|
           menu.choice 'Create a SMART Goal', '1'
@@ -72,30 +72,29 @@ module SmartGoals
     def create_goal
       system "clear"
       goal = Goal.new
-      
+
       # Ask the user for his Goal but not to worry about it too much at this point
       goal.description = @question.ask_for_description("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
 
       # The goal description has been set. Thank the user. Tell him more about the app.
       puts <<~MESSAGE
-        
-        Thanks for telling us your goal! 
-        
+
+        Thanks for telling us your goal!
+
         Welcome to the Goal Refinement Centre. As you go through this process,
         you will see your goal being transformed from vague into something specific
         and actionable. You will know exactly what your goal is and the specific
         tasks you need to complete to get there. You can imagine your goal now as
         a piece of raw steel but by the time you go through this process it will be
         forged into a sword.
-      
-        Let's start out by setting an target date for achieving your goal. If you
+
+        Let's start out by setting a target date for achieving your goal. If you
         don't set a target date, your goal will just remain a fantasy. Setting a
         target date for your goal is important step in the SMART goal process.
-
       MESSAGE
-      
+
       # Ask the user for a target date in dd-mm-yyyy format
-      goal.target_date = @question.ask_for_target_date("When would you like to achieve this Goal? (format: dd-mm-yyyy)")
+      goal.target_date = @question.ask_for_target_date("\nWhen would you like to achieve this Goal? (format: dd-mm-yyyy)")
 
       # Display the SMART words
       list_smart_words
@@ -124,7 +123,7 @@ module SmartGoals
     def list_smart_words
       system "clear"
       puts <<~MESSAGE
-        
+
         Now that we've set a target date, let's make your goals SMART:
 
         - Specific
@@ -142,48 +141,47 @@ module SmartGoals
     def make_goal_specific(goal)
       system "clear"
       puts <<~MESSAGE
-        At the moment your goal is still very raw. You need your goal to be SPECIFIC
-        so you can have a better idea of what your end goal is. For example if your
-        current goal is 'lose weight', it's not specific enough so you won't know
-        exactly what you're working towards. A better goal is 'get to 12% body-fat in
-        6 months'. And then to have a series of tasks to complete to get there.
-        We will guide you through that later."
 
-        For now, try and rewrite your goal. Make it more SPECIFIC so it meets the
-        SMART criteria as best you can.
+        YOUR CURRENT GOAL: #{goal.description}
 
+        At the moment, your goal may still be quite vague. 
+        
+        It needs to be SPECIFIC so you have a better idea of what
+        you're trying to achieve.
 
-        The goal that you wrote:
-        #{goal.description}
+        For example, a goal 'to lose weight' is not specific enough.
 
+        A better goal would be 'get to 12% body-fat in 6 months'.
+
+        Try and rewrite your goal so it's more SPECIFIC.
       MESSAGE
       # Ask for a more specific goal description
-      goal.description = @question.ask_for_description("Re-write your Goal to be more Specific:\n")
+      goal.description = @question.ask_for_description("\nRe-write your Goal to be more Specific:\n")
     end
 
     # Ask if the goal is Attainable
     def make_goal_attainable(goal)
       system "clear"
       puts <<~MESSAGE
+
         Is your goal ATTAINABLE?
-        Is it too easy?
-        Is it set at the right level?
+        Or is it too easy?
 
         Please write out why you think your goal is set at the right level.
-
       MESSAGE
       # Ask for an ATTAINABLE description
-      goal.attainable = @question.ask_for_description("Describe why your goal is Attainable:\n")
+      goal.attainable = @question.ask_for_description("\nDescribe why your goal is Attainable:\n")
     end
 
     # Ask if the goal is Relevant
     def make_goal_relevant(goal)
       system "clear"
       puts <<~MESSAGE
+
         Is your goal RELEVANT?
         Why is this goal important to you?
 
-        Please write out why you'd like to achieve this goal.
+        Please write why you'd like to achieve this goal.
       MESSAGE
       # Ask for RELEVANT description
       goal.relevant = @question.ask_for_description("\nDescribe why your goal is Relevant:\n")
@@ -192,19 +190,19 @@ module SmartGoals
     # Ask for the user's friend's email address
     def set_friend_email
       system "clear"
-      puts <<~MESSAGE        
-        We will now go even further and implement steps that 
+      puts <<~MESSAGE
+
+        We will now go even further and implement steps that
         make achieving your goal virtually inevitable.
 
-        Goals that you're accountable to someone to achieve 
-        are much more likely to be met than those where there 
-        isn't external pressure.
+        It's easier to achieve your goals if you have someone
+        to motivate you.
 
-        Please enter the name of someone that you don't want 
-        to let down.
+        Please enter the name of someone you don't want to
+        let down.
 
-        We will let them know if you failed to achieve your 
-        goals and get them to hassle you.
+        We'll let them know if you've failed to achieve your
+        goals and get them to keep you going.
       MESSAGE
 
       @friend_name = @question.ask_for_name("\nFriend's name:")
@@ -216,10 +214,10 @@ module SmartGoals
       system "clear"
 
       # Tell the user they did a good job
-      puts <<~MESSAGE 
-        Awesome, that's great. Good job on turning your original 
-        goal into a SMART goal! You're welcome to go back at any 
-        time to add more tasks or goals you want to achieve.
+      puts <<~MESSAGE
+
+        Good job on turning your original goal into a SMART goal!
+        You're welcome to go back later and add more tasks or goals.
       MESSAGE
 
       # Press enter to finish
@@ -238,7 +236,7 @@ module SmartGoals
       else
         # Create new hash for goals
         goals = {}
-        
+
         # Display list of goals
         @goals.each_with_index do |goal, index|
           goals["#{index + 1}. #{goal.description}"] = goal
@@ -253,7 +251,7 @@ module SmartGoals
     # View list of goals
     def view_goals
       system "clear"
-      
+
       # Display goals menu
       goal = display_goals("view")
 
@@ -289,7 +287,7 @@ module SmartGoals
             goal.description = @question.ask_for_description("Please enter new description")
 
           elsif attribute == :target_date # User selects target date
-            
+
             # Ask the user for a new target date in dd-mm-yyyy format
             goal.target_date = @question.ask_for_target_date("\nPlease enter a new target date (format: dd-mm-yyyy)")
 

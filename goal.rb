@@ -64,8 +64,7 @@ module SmartGoals
       tasks = Terminal::Table.new(
         title: table_title,
         headings: ['No.', 'Description', 'Recurring', 'Target Date'],
-        rows: rows,
-        style: { width: 40 }
+        rows: rows
       )
 
       # Display terminal table
@@ -197,7 +196,7 @@ module SmartGoals
           .each_with_index do |task, index|
             todo_tasks["#{index + 1}. #{task.description}"] = task
           end
-        todo_tasks["#{todo_tasks.length + 1}. Exit"] = :exit
+        todo_tasks["#{todo_tasks.length + 1}. Back"] = :exit
         
         task = PROMPT.select("Select a task to #{operation}:", todo_tasks)
       end
@@ -217,7 +216,7 @@ module SmartGoals
       task = get_task_choice("edit")
 
       # If task was set
-      if !task.nil?
+      if task != :exit
         loop do
           system "clear"
           attributes = {
