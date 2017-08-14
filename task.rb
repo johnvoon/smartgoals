@@ -1,3 +1,4 @@
+require 'pry'
 # Purpose: To contain the attributes of the tasks
 module SmartGoals
   class Task
@@ -26,6 +27,7 @@ module SmartGoals
                       when :hourly then self.target_date - (60 * 30)
                       else self.target_date - (60 * 60 * 24)
                       end
+      binding.pry
       
       # Set the reminder message
       message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{self.description}"

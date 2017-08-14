@@ -47,7 +47,7 @@ module SmartGoals
             q.responses[:invalid_type] = "Please enter a valid date in dd-mn-yyyy format."
             end
             # Parse the date in dd-mm-yyyy
-            target_date = Date.strptime(target_date, "%d-%m-%Y")
+            target_date = Time.strptime(target_date, "%d-%m-%Y")
         end
 
     end
