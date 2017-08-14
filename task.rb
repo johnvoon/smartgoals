@@ -18,18 +18,6 @@ module SmartGoals
       @status = :todo # Default status is set to :todo
     end
 
-    # Change status and colorize
-    def status_color=(status)
-      @status = status
-      if @status == :completed
-        self.description = self.description.colorize(:color => :black, :background => :green)
-      elsif @status == :failed
-        self.description = self.description.colorize(:red)
-      else 
-        self.description = self.description.colorize(:white)
-      end
-    end
-
     # Create a scheduled reminder
     def create_reminder_notification
       @reminder_scheduler = Scheduler.new

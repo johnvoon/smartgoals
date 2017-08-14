@@ -33,15 +33,27 @@ module SmartGoals
       end
     end
 
+    # Change color of the text in the table
+    def generate_color(status)
+      if status == :completed
+        :green
+      elsif status == :failed
+        :red
+      else
+        :white
+      end
+    end
+
     # Display list of tasks for Terminal Table
     def display_tasks(status)
+          
       # Create rows array
       rows = []
       table_title =
         case status
         when :todo then "Your Tasks To Be Done"
-        when :completed then "Your Completed Tasks"
-        when :failed then "Your Failed Tasks"
+        when :completed then "Your Completed Tasks".colorize(generate_color(status))
+        when :failed then "Your Failed Tasks".colorize(generate_color(status))
         end
 
       # Check if tasks were created
@@ -49,10 +61,10 @@ module SmartGoals
         @tasks.each_with_index do |task, index|
           # Append tasks to rows array
           rows << [
-            (index + 1).to_s,
-            task.description,
-            task.frequency.to_s.gsub('_', ' ').capitalize,
-            task.target_date ? task.target_date.strftime("%d/%m/%Y") : ""
+            (index + 1).to_s.colorize(generate_color(status)),
+            task.description.colorize(generate_color(status)),
+            task.frequency.to_s.gsub('_', ' ').capitalize.colorize(generate_color(status)),
+            task.target_date ? task.target_date.strftime("%d/%m/%Y").colorize(generate_color(status)) : ""
           ] if task.status == status
         end
       else
@@ -269,12 +281,12 @@ module SmartGoals
       loop do
         task = get_task_choice("mark complete")
         task.status = :completed
-        task.status_color = task.status
-        if task.frequency == :once
-          task.cancel_reminder_notification
-          task.cancel_failed_notification
-        end
-        puts "Congratulations on completing this task!"
+
+        # Cancel notifications 
+        task.cancel_reminder_notification
+        task.cancel_failed_notification
+        
+          puts "Congratulations on completing this task!"
         break unless CLI.agree("Mark another task complete? (y/n)")
         # If task was set
         if !task.nil?

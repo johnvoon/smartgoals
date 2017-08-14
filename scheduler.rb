@@ -10,15 +10,6 @@ module SmartGoals
       @schedule = Rufus::Scheduler.new
     end
 
-    # Schedule a color change
-    def schedule_color_change_by_status(notification_time, parent_task, status)
-      task = parent_task
-      @schedule.at notification_time.to_s do
-        task.status_color = status
-        @schedule.shutdown
-      end
-    end
-
     def schedule_failed_status_change(task, notification_time)
       @schedule.at notification_time.to_s do
         task.status = :failed
