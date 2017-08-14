@@ -45,7 +45,7 @@ module SmartGoals
       elsif status == :failed
         :red
       else
-        :white
+        :yellow
       end
     end
 
@@ -56,7 +56,7 @@ module SmartGoals
       rows = []
       table_title =
         case status
-        when :todo then "Your Tasks To Be Done"
+        when :todo then "Your Tasks To Be Done".colorize(generate_color(status))
         when :completed then "Your Completed Tasks".colorize(generate_color(status))
         when :failed then "Your Failed Tasks".colorize(generate_color(status))
         end

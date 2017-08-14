@@ -42,7 +42,11 @@ module SmartGoals
         system "clear"
 
         # Make the user feel welcome
-        puts "\nHi #{self.name}! We will be guiding you through the process of setting SMART goals."
+        puts <<~MESSAGE
+          \nHi #{self.name}! 
+          
+          We'll be guiding you through the process of setting SMART goals.
+        MESSAGE
 
         # Ask the user for a menu choice
         choice = PROMPT.select("\nIf you are new user, select 'Create a SMART Goal'.") do |menu|
