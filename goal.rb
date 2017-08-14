@@ -165,16 +165,16 @@ module SmartGoals
         end
 
         case choice
-          when '1'
-            create_tasks
-          when '2'
-            edit_task
-          when '3'
-            delete_task
-          when '4'
-            mark_task_complete
-          when '5'
-            break
+        when '1'
+          create_tasks
+        when '2'
+          edit_task
+        when '3'
+          delete_task
+        when '4'
+          mark_task_complete
+        when '5'
+          break
         end
       end
     end
@@ -196,7 +196,7 @@ module SmartGoals
           .each_with_index do |task, index|
             todo_tasks["#{index + 1}. #{task.description}"] = task
           end
-        todo_tasks["#{todo_tasks.length + 1}. Back"] = :exit
+        todo_tasks["#{todo_tasks.length + 1}. Back"] = :back
         
         task = PROMPT.select("Select a task to #{operation}:", todo_tasks)
       end
@@ -216,7 +216,7 @@ module SmartGoals
       task = get_task_choice("edit")
 
       # If task was set
-      if task != :exit
+      if task != :back
         loop do
           system "clear"
           attributes = {
@@ -230,13 +230,19 @@ module SmartGoals
           elsif attribute == :frequency
             frequency = get_frequency
             task.frequency = frequency
+          
+            recurring_scheduler_first =
+              @recurring_schedulers
+                .select {|scheduler| scheduler.id == task.recurring_scheduler_id }
+                .first
+            recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first
+            
+            schedule_recurring_task_creation(task)
           elsif attribute == :back
             break
           end
           break unless CLI.agree("Edit another attribute? (y/n)")
         end
-      else
-        # Just go back to menu
       end
     end
 
@@ -247,14 +253,14 @@ module SmartGoals
         binding.pry
         task = get_task_choice("delete")
         # If task was set
-        if task != :exit
+        if task != :back
           @tasks.delete(task)
           # If recurring scheduler set, shut it down
           recurring_scheduler_first =
             @recurring_schedulers
               .select {|scheduler| scheduler.id == task.recurring_scheduler_id }
               .first
-          recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first != nil
+          recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first
           break unless CLI.agree("Delete another task? (y/n)")
         else
           # Just go back to menu
