@@ -333,7 +333,7 @@ module SmartGoals
           end
 
           # Edit another attribute, otherwise go back to main menu
-          break unless CLI.agree("Edit another attribute? (y/n)")
+          break unless CLI.agree("\nEdit another attribute? (y/n)")
         end
       end
     end
@@ -353,7 +353,7 @@ module SmartGoals
             end
           end
           @goals.delete(goal)
-          break unless CLI.agree("Delete another goal? (y/n)")
+          break unless CLI.agree("\nDelete another goal? (y/n)")
         end
       end
     end

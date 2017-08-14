@@ -196,9 +196,15 @@ module SmartGoals
       display_tasks(:completed)
       display_tasks(:failed)
       if @tasks.empty?
-        choice = CLI.agree("You haven't set any tasks yet. Set a task now? (y/n)")
-        if choice
+        # Check if operation is create
+        if operation == "create"
           create_tasks
+        else
+          # Only verify this if it's not a create operation
+          choice = CLI.agree("You haven't set any tasks yet. Set a task now? (y/n)")
+          if choice
+            create_tasks
+          end
         end
       else
         todo_tasks = {}
@@ -284,7 +290,7 @@ module SmartGoals
           elsif attribute == :back
             break
           end
-          break unless CLI.agree("Edit another attribute? (y/n)")
+          break unless CLI.agree("\nEdit another attribute? (y/n)")
         end
       end
     end
@@ -309,7 +315,7 @@ module SmartGoals
               .select {|scheduler| scheduler.id == task.recurring_scheduler_id }
               .first
           recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first
-          break unless CLI.agree("Delete another task? (y/n)")
+          break unless CLI.agree("\nDelete another task? (y/n)")
         else
           # Just go back to menu
           break
@@ -336,7 +342,7 @@ module SmartGoals
           task.cancel_failed_notification
 
           puts "Congratulations on completing this task!"
-          break unless CLI.agree("Mark another task complete? (y/n)")
+          break unless CLI.agree("\nMark another task complete? (y/n)")
         else
           break
         end
