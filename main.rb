@@ -5,7 +5,6 @@ require 'highline'        # Gem to create better command line interface
 require 'tty-prompt'      # Gem to create better console prompt component
 require 'terminal-table'  # Gem to create tabled UI for the console
 require 'os'              # Gem to detect the user's operating system
-require 'concurrent'      # Gem that provides thread safe concurrency
 require 'mail'            # Gem to create e-mail messages
 require 'colorize'        # Gem to change the color of the text
 
