@@ -18,6 +18,19 @@ module SmartGoals
       @status = :todo # Default status is set to :todo
     end
 
+    # Change status and colorize
+    def status_color=(status)
+      @status = status
+      puts status
+      if @status == :completed
+        self.description = self.description.colorize(:color => :black, :background => :green)
+      elsif @status == :failed
+        self.description = self.description.colorize(:red)
+      else 
+        self.description = self.description.colorize(:white)
+      end
+    end
+
     # Create a scheduled reminder
     def create_reminder_notification
       scheduler = Scheduler.new
@@ -30,7 +43,7 @@ module SmartGoals
       binding.pry
       
       # Set the reminder message
-      message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{self.description}"
+      message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{self.description.uncolorize}"
 
       # Schedule a popup message
       scheduler.schedule_popup(message, reminder_time)
@@ -41,10 +54,11 @@ module SmartGoals
 
     # Create a scheduled fail notification
     def create_failed_notification
+      
       scheduler = Scheduler.new
       
       # Set the failed message
-      user_message = "Hey #{GOALSETTER.name}, You did not #{self.description} today."
+      user_message = "Hey #{GOALSETTER.name}, You did not #{self.description.uncolorize} today."
 
       # Set the failed email message
       user_email = <<~MESSAGE
@@ -71,6 +85,9 @@ module SmartGoals
 
         The Smart Goals Team
       MESSAGE
+      
+      # Set the color change to red for failure
+      scheduler.schedule_color_change_by_status(@target_date, self, :failed)
 
       # Set the reminder message
       scheduler.schedule_popup(user_message, self.target_date)

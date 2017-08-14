@@ -7,6 +7,7 @@ require 'terminal-table'  # Gem to create tabled UI for the console
 require 'os'              # Gem to detect the user's operating system
 require 'concurrent'      # Gem that provides thread safe concurrency
 require 'mail'            # Gem to create e-mail messages
+require 'colorize'        # Gem to change the color of the text
 
 require_relative 'helpers'    # Class which provides our validation rules, calculation and convertion
 require_relative 'question'   # Class which provides common questions and validate answers

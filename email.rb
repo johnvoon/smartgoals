@@ -3,13 +3,18 @@ module SmartGoals
     class Email
         # Send an email message
         def send_email(email, message)
+
+            # Account Credentials
+            email_account = 'yourfriendisfailing@gmail.com'
+            email_password = 'UpYourGame'
+
             # Set mail options
             options = {
                 :address              => "smtp.gmail.com",
                 :port                 => 587,
                 :domain               => 'your.host.name',
-                :user_name            => 'tellyourbuddytouptheirgame@gmail.com',
-                :password             => 'UpYourGame',
+                :user_name            => email_account,
+                :password             => email_password,
                 :authentication       => 'plain',
                 :enable_starttls_auto => true
             }
@@ -22,7 +27,7 @@ module SmartGoals
             # Send the email message
             Mail.deliver do
                 to email
-                from 'tellyourbuddytouptheirgame@gmail.com'
+                from 'SmartGoals Team'
                 subject 'SmartGoals Notifications'
                 body message
             end

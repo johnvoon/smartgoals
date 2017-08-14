@@ -259,6 +259,11 @@ module SmartGoals
       system "clear"
       loop do
         task = get_task_choice("mark complete")
+        task.status = :completed
+        task.status_color = task.status
+              
+        puts "Congratulations on completing this task!"
+        break unless CLI.agree("Mark another task complete? (y/n)")
         # If task was set
         if !task.nil?
           task.status = :completed
