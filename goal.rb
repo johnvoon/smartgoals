@@ -26,15 +26,15 @@ module SmartGoals
 
     # Display the current goal
     def display_goal
-      puts "\nYOUR CURRENT GOAL IS: #{self.description}"
+      puts "\nYOUR CURRENT GOAL IS: #{self.description}".light_white
       if self.target_date
-        puts "\nTARGET DATE TO REACH YOUR GOAL: #{self.target_date.strftime('%-d %B %Y')}"
+        puts "\nTARGET DATE TO REACH YOUR GOAL: #{self.target_date.strftime('%-d %B %Y')}".light_white
       end
       if self.attainable
-        puts "\nWHY I CAN ACHIEVE THIS GOAL: #{self.attainable}"
+        puts "\nWHY I CAN ACHIEVE THIS GOAL: #{self.attainable}".light_white
       end
       if self.relevant
-        puts "\nWHY THIS GOAL MATTERS: #{self.relevant}"
+        puts "\nWHY THIS GOAL MATTERS: #{self.relevant}".light_white
       end
     end
 
@@ -76,13 +76,13 @@ module SmartGoals
         end
       else
         # No tasks were created. Just display "No tasks added yet"
-        rows << ["", "No tasks added yet"]
+        rows << ["", "No tasks added yet".light_white]
       end
 
       # Create terminal table for tasks
       tasks = Terminal::Table.new(
         title: table_title,
-        headings: ['No.', 'Description', 'Recurring', 'Target Date/Time'],
+        headings: ['No.'.light_white, 'Description'.light_white, 'Recurring'.light_white, 'Target Date/Time'.light_white],
         rows: rows
       )
 
@@ -93,32 +93,32 @@ module SmartGoals
 
     # Display prompt for frequency
     def get_frequency
-      PROMPT.select("\nHow often would you like to do this task?") do |menu|
-        menu.choice 'Just once', :once
-        menu.choice 'Every Minute', :every_minute
-        menu.choice 'Hourly', :hourly
-        menu.choice 'Daily', :daily
-        menu.choice 'Weekly', :weekly
-        menu.choice 'Monthly', :monthly
-        menu.choice 'Yearly', :yearly
+      PROMPT.select("\nHow often would you like to do this task?".light_white) do |menu|
+        menu.choice 'Just once'.light_white, :once
+        menu.choice 'Every Minute'.light_white, :every_minute
+        menu.choice 'Hourly'.light_white, :hourly
+        menu.choice 'Daily'.light_white, :daily
+        menu.choice 'Weekly'.light_white, :weekly
+        menu.choice 'Monthly'.light_white, :monthly
+        menu.choice 'Yearly'.light_white, :yearly
       end
     end
 
     # Create new tasks
     def create_tasks
       system "clear"
-      if CLI.agree("\nWould you like to set tasks now? (y/n)")
+      if CLI.agree("\nWould you like to set tasks now? (y/n)".light_white)
         loop do
           display_goal
           display_tasks(:todo)
           task = Task.new
-          task.description = @question.ask_for_description("\nDescribe your task:")
+          task.description = @question.ask_for_description("\nDescribe your task:".light_white)
           task.frequency = get_frequency
           task.creation_date = Time.now.getlocal
 
           case task.frequency
             when :once
-              task.target_date = @question.ask_for_target_date("\nWhen do you aim to complete this task by (dd-mm-yyyy)? \nMake sure your timeframe is REALISTIC.")
+              task.target_date = @question.ask_for_target_date("\nWhen do you aim to complete this task by (dd-mm-yyyy)? \nMake sure your timeframe is REALISTIC.".light_white)
 
             else
               task.target_date = Helpers.calculate_task_target_date(
@@ -136,7 +136,7 @@ module SmartGoals
           system "clear"
           display_goal
           display_tasks(:todo)
-          break unless CLI.agree("\nWould you like to set a new task? (yes/no)")
+          break unless CLI.agree("\nWould you like to set a new task? (yes/no)".light_white)
         end
       end
     end
@@ -170,11 +170,11 @@ module SmartGoals
         system "clear"
         self.view_tasks
         puts ""
-        choice = PROMPT.select("What would you like to do for your goal?") do |menu|
-          menu.choice 'Create New Tasks', '1'
-          menu.choice 'Delete Task', '2'
-          menu.choice 'Mark Tasks Complete', '3'
-          menu.choice 'Back', '4'
+        choice = PROMPT.select("What would you like to do for your goal?".light_white) do |menu|
+          menu.choice 'Create New Tasks'.light_white, '1'
+          menu.choice 'Delete Task'.light_white, '2'
+          menu.choice 'Mark Tasks Complete'.light_white, '3'
+          menu.choice 'Back'.light_white, '4'
         end
 
         case choice
@@ -201,7 +201,7 @@ module SmartGoals
           create_tasks
         else
           # Only verify this if it's not a create operation
-          choice = CLI.agree("You haven't set any tasks yet. Set a task now? (y/n)")
+          choice = CLI.agree("You haven't set any tasks yet. Set a task now? (y/n)".light_white)
           if choice
             create_tasks
           end
@@ -215,7 +215,7 @@ module SmartGoals
           end
         todo_tasks["#{todo_tasks.length + 1}. Back"] = :back
 
-        task = PROMPT.select("\nSelect an ONGOING task to #{operation}:", todo_tasks)
+        task = PROMPT.select("\nSelect an ONGOING task to #{operation}:".light_white, todo_tasks)
       end
       # Return task choice
       task
@@ -244,11 +244,11 @@ module SmartGoals
             "Frequency: #{task.frequency}": :frequency,
             "Back": :back
           }
-          attribute = PROMPT.select("Select which task attribute to edit", attributes)
+          attribute = PROMPT.select("Select which task attribute to edit".light_white, attributes)
           if attribute == :description
 
             # Change the description
-            task.description = @question.ask_for_description("Enter new description")
+            task.description = @question.ask_for_description("Enter new description".light_white)
             
             # Cancel notifications
             task.cancel_reminder_notification
@@ -290,7 +290,7 @@ module SmartGoals
           elsif attribute == :back
             break
           end
-          break unless CLI.agree("\nEdit another attribute? (y/n)")
+          break unless CLI.agree("\nEdit another attribute? (y/n)".light_white)
         end
       end
     end
@@ -315,7 +315,7 @@ module SmartGoals
               .select {|scheduler| scheduler.id == task.recurring_scheduler_id }
               .first
           recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first
-          break unless CLI.agree("\nDelete another task? (y/n)")
+          break unless CLI.agree("\nDelete another task? (y/n)".light_white)
         else
           # Just go back to menu
           break
@@ -341,8 +341,8 @@ module SmartGoals
           task.cancel_reminder_notification
           task.cancel_failed_notification
 
-          puts "Congratulations on completing this task!"
-          break unless CLI.agree("\nMark another task complete? (y/n)")
+          puts "Congratulations on completing this task!".light_white
+          break unless CLI.agree("\nMark another task complete? (y/n)".light_white)
         else
           break
         end

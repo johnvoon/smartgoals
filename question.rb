@@ -8,7 +8,7 @@ module SmartGoals
                 q.validate = Helpers.not_empty?
 
                 # Friend name is empty
-                q.responses[:not_valid] = "\The name cannot be empty. Please enter a valid name."
+                q.responses[:not_valid] = "\The name cannot be empty. Please enter a valid name.".light_white
             end
         end
 
@@ -19,7 +19,7 @@ module SmartGoals
             q.validate = Helpers.valid_email?
 
             # Email is not valid
-            q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email. (e.g. someone@example.com)"
+            q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email. (e.g. someone@example.com)".light_white
             end
         end
 
@@ -30,7 +30,7 @@ module SmartGoals
                 q.validate = Helpers.not_empty?
 
                 # Description is empty
-                q.responses[:not_valid] = "\nYour description cannot be empty. Please enter a valid description."
+                q.responses[:not_valid] = "\nYour description cannot be empty. Please enter a valid description.".light_white
             end
         end
 
@@ -41,10 +41,10 @@ module SmartGoals
                 q.validate = Helpers.valid_date?
 
                 # Date should be a future date
-                q.responses[:not_valid] = "The date has to be later than today. Please enter a date in the future."
+                q.responses[:not_valid] = "The date has to be later than today. Please enter a date in the future.".light_white
 
                 # Date should be in dd-mm-yyyy format
-                q.responses[:invalid_type] = "Please enter a valid date in dd-mn-yyyy format."
+                q.responses[:invalid_type] = "Please enter a valid date in dd-mn-yyyy format.".light_white
             end
             # Parse the date in dd-mm-yyyy
             target_date = Time.strptime(target_date, "%d-%m-%Y")
