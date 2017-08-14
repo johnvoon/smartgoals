@@ -345,6 +345,13 @@ module SmartGoals
       goal = get_goal_choice("delete")
       if goal && goal != :back
         loop do
+          # Remove notifications if goal is not empty on delete
+          if goal.tasks.any?
+            goal.tasks.each do |task|
+              task.cancel_reminder_notification
+              task.cancel_failed_notification
+            end
+          end
           @goals.delete(goal)
           break unless CLI.agree("Delete another goal? (y/n)")
         end
