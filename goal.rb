@@ -25,10 +25,16 @@ module SmartGoals
     end
 
     # Display the current goal
-    def display_goal(goal)
-      puts "\nYOUR CURRENT GOAL IS: #{goal.description}"
-      if goal.target_date
-        puts "TARGET DATE TO REACH YOUR GOAL: #{goal.target_date.strftime('%-d %B %Y')}"
+    def display_goal
+      puts "\nYOUR CURRENT GOAL IS: #{self.description}"
+      if self.target_date
+        puts "\nTARGET DATE TO REACH YOUR GOAL: #{self.target_date.strftime('%-d %B %Y')}"
+      end
+      if self.attainable
+        puts "\nWHY I CAN ACHIEVE THIS GOAL: #{self.attainable}"
+      end
+      if self.relevant
+        puts "\nWHY THIS GOAL MATTERS: #{self.relevant}"
       end
     end
 
@@ -101,7 +107,7 @@ module SmartGoals
       system "clear"
       if CLI.agree("\nWould you like to set tasks now? (y/n)")
         loop do
-          display_goal(self)
+          display_goal
           display_tasks(:todo)
           task = Task.new
           task.description = @question.ask_for_description("\nDescribe your task:")
@@ -126,7 +132,7 @@ module SmartGoals
           task.create_failed_notification
 
           system "clear"
-          display_goal(self)
+          display_goal
           display_tasks(:todo)
           break unless CLI.agree("\nWould you like to set a new task? (yes/no)")
         end
@@ -160,24 +166,23 @@ module SmartGoals
     def display_task_management_menu
       loop do
         system "clear"
+        self.view_tasks
+        puts ""
         choice = PROMPT.select("What would you like to do for your goal?") do |menu|
           menu.choice 'Create New Tasks', '1'
-          menu.choice 'Edit Task', '2'
-          menu.choice 'Delete Task', '3'
-          menu.choice 'Mark Tasks Complete', '4'
-          menu.choice 'Back', '5'
+          menu.choice 'Delete Task', '2'
+          menu.choice 'Mark Tasks Complete', '3'
+          menu.choice 'Back', '4'
         end
 
         case choice
         when '1'
           create_tasks
         when '2'
-          edit_task
-        when '3'
           delete_task
-        when '4'
+        when '3'
           mark_task_complete
-        when '5'
+        when '4'
           break
         end
       end
@@ -210,8 +215,11 @@ module SmartGoals
 
     # View selected task
     def view_tasks
-      puts "View Tasks"
-      get_task_choice("view")
+      display_goal
+
+      display_tasks(:completed)
+      display_tasks(:failed)
+      display_tasks(:todo)
     end
 
     # Edit selected task

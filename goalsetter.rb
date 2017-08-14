@@ -257,7 +257,7 @@ module SmartGoals
     end
 
     # Display list of goals
-    def display_goals(operation)
+    def get_goal_choice(operation)
       system "clear"
       if @goals.empty?
         if CLI.agree("You haven't set any goal yet. Set a goal now? (y/n)")
@@ -285,9 +285,9 @@ module SmartGoals
     def view_goals
       system "clear"
 
-      # Display goals menu
-      goal = display_goals("view")
-
+      # Display goals menu and get goal choice
+      goal = get_goal_choice("view")
+      
       # If goal was set
       if goal && goal != :back
         goal.display_task_management_menu # Display task management menu
@@ -299,7 +299,7 @@ module SmartGoals
       system "clear"
 
       # Display goals menu
-      goal = display_goals("edit")
+      goal = get_goal_choice("edit")
 
       # If goal was set
       if goal && goal != :back
@@ -336,7 +336,7 @@ module SmartGoals
     def delete_goal
       system "clear"
       # Display Loop: Ask the user which goal to delete
-      goal = display_goals("delete")
+      goal = get_goal_choice("delete")
       if goal && goal != :back
         loop do
           @goals.delete(goal)

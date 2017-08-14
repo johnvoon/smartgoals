@@ -14,15 +14,9 @@
 - [DONE] Popup reminders background job (GLENN)
 - Task stats/progress (ALESSIO)
 - [DONE] Documentation (ALESSIO/CHRIS)
-- Program flow - guide through SMART Goal setting process, e.g. allow editing of goal description at the end of the process (JOHN/CHRIS)
+- [DONE] Program flow - guide through SMART Goal setting process, e.g. allow editing of goal description at the end of the process (JOHN/CHRIS)
 
 ## Bonus Functionality (if time permits)
-- Incorporate mail gem
+- [DONE] Incorporate mail gem
 - File storage
-- UI/UX Improvements
-
-## To present
-- Create a Goal
-- Add One Off Task
-- Add Recurring Task
-- Edit Goal
+- [DONE] UI/UX Improvements
