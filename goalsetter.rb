@@ -2,18 +2,19 @@
 module SmartGoals
   class GoalSetter
     # What it has
-    attr_accessor :name         # name:  String
-    attr_accessor :email        # email: String
-    attr_accessor :friend_name  # friend name:   String
-    attr_accessor :friend_email # friend email:  String
-    attr_accessor :goals        # goal:  Array of Goal
+    attr_accessor :name         # name : String
+    attr_accessor :email        # email : String
+    attr_accessor :friend_name  # friend_name : String
+    attr_accessor :friend_email # friend_email :  String
+    attr_accessor :goals        # goals : Array of Goal
+    attr_reader   :question     # question: Questions
 
     # How to describe it
     def initialize
       @goals = []
+      @question = Question.new
     end
 
-    # What can it do
     # Start the app and display the menu
     def run_program
       # Display welcome screen
@@ -21,7 +22,7 @@ module SmartGoals
 
       # Display user menu choices
       get_goal_management_choice
-    end
+    end    
 
     # Display the welcome screen
     def welcome_screen
@@ -29,22 +30,10 @@ module SmartGoals
       puts "Welcome to SMART Goals!"
 
       # Ask for the user's name
-      @name = CLI.ask("\nWhat's your name?") do |n|
-        # Check if the user's name is empty
-        n.validate = Helpers.not_empty?
-
-        # Name is empty
-        n.responses[:not_valid] = "\nInvalid name. Please enter a valid name."
-      end
+      @name = @question.ask_for_name("\nWhat's your name?")
 
       # Ask for the user's email
-      @email = CLI.ask("\nWhat is your email? This is where we will be sending you notifications.") do |q|
-        # Check if the user's email is valid
-        q.validate = Helpers.valid_email?
-        
-        # Email is not in the right format
-        q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
-      end
+      @email = @question.ask_for_email("\nWhat is your email? This is where we will be sending you notifications.")
     end
 
     # Display the menu choices
@@ -53,7 +42,7 @@ module SmartGoals
         system "clear"
 
         # Make the user feel welcome
-        puts "\nHi #{@name}! We will be guiding you through the process of setting SMART goals."
+        puts "\nHi #{self.name}! We will be guiding you through the process of setting SMART goals."
         
         # Ask the user for a menu choice
         choice = PROMPT.select("\nIf you are new user, select 'Create a SMART Goal'.") do |menu|
@@ -85,8 +74,8 @@ module SmartGoals
       goal = Goal.new
       
       # Ask the user for his Goal but not to worry about it too much at this point
-      goal.description = CLI.ask("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
-      
+      goal.description = @question.ask_for_description("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
+
       # The goal description has been set. Thank the user. Tell him more about the app.
       puts <<~MESSAGE
         
@@ -99,25 +88,14 @@ module SmartGoals
         a piece of raw steel but by the time you go through this process it will be
         forged into a sword.
       
-        Let's start out by setting a target date for achieving your goal.
-        If you don't set a target date, your goal will just remain a fantasy. 
-        This is a very important step in the SMART goal process.
+        Let's start out by setting an target date for achieving your goal. If you
+        don't set a target date, your goal will just remain a fantasy. Setting a
+        target date for your goal is important step in the SMART goal process.
+
       MESSAGE
       
-      # Ask the user for a target date
-      target_date = CLI.ask("\nPlease enter a target date (format: dd-mm-yyyy)") do |q|
-        # Validate date
-        q.validate = Helpers.valid_date?
-
-        # Date should be a future date
-        q.responses[:not_valid] = "Please enter a date in the future."
-
-        # Date should be in d-m-Y format
-        q.responses[:invalid_type] = "Please enter a valid date."
-      end
-
-      # Get the target date in d-m-Y format
-      goal.target_date = Date.strptime(target_date, "%d-%m-%Y")
+      # Ask the user for a target date in dd-mm-yyyy format
+      goal.target_date = @question.ask_for_target_date("When would you like to achieve this Goal? (format: dd-mm-yyyy)")
 
       # Display the SMART words
       list_smart_words
@@ -163,32 +141,51 @@ module SmartGoals
     # Ask the user for the goal to be more specific
     def make_goal_specific(goal)
       system "clear"
-      puts <<~MESSAGE 
-        At the moment your goal is still very raw. You need your goal to be specific
+      puts <<~MESSAGE
+        At the moment your goal is still very raw. You need your goal to be SPECIFIC
         so you can have a better idea of what your end goal is. For example if your
         current goal is 'lose weight', it's not specific enough so you won't know
         exactly what you're working towards. A better goal is 'get to 12% body-fat in
         6 months'. And then to have a series of tasks to complete to get there.
         We will guide you through that later."
+
+        For now, try and rewrite your goal. Make it more SPECIFIC so it meets the
+        SMART criteria as best you can.
+
+
+        The goal that you wrote:
+        #{goal.description}
+
       MESSAGE
-      description = CLI.ask("\nFor now, try and rewrite your goal so it meets this\nSMART criteria as best you can.")
-      goal.description = description if description
+      # Ask for a more specific goal description
+      goal.description = @question.ask_for_description("Re-write your Goal to be more Specific:\n")
     end
 
     # Ask if the goal is Attainable
     def make_goal_attainable(goal)
       system "clear"
-      puts "\nIs your goal Attainable? Or is it too far-fetched?"
-      attainable = CLI.ask("\nPlease explain why you think you can achieve your goal.")
-      goal.attainable = attainable
+      puts <<~MESSAGE
+        Is your goal ATTAINABLE?
+        Is it too easy?
+        It set at the right level?
+
+        Please write out why you think your goal is set at the right level.
+
+      MESSAGE
+      # Ask for an ATTAINABLE description
+      goal.attainable = @question.ask_for_description("Describe how your Goal can be Attainable:\n")
     end
 
     # Ask if the goal is Relevant
     def make_goal_relevant(goal)
       system "clear"
-      puts "\nIs your goal Relevant? Why is this goal important to you?"
-      relevant = CLI.ask("\nPlease explain why you want to achieve this goal.")
-      goal.relevant = relevant
+      puts <<~MESSAGE
+        Is your goal RELEVANT?
+        Why is this goal important to you?
+
+      MESSAGE
+      # Ask for RELEVANT description
+      goal.relevant = @question.ask_for_description("Please write out why you'd like to achieve this goal.\n\nDescribe how your Goal can be Relevant:\n")
     end
 
     # Ask for the user's friend's email address
@@ -200,22 +197,24 @@ module SmartGoals
 
         Goals that you're accountable to someone to achieve are much more likely to be met than
         those where there isn't external pressure.
+
       MESSAGE
-      @friend_name = CLI.ask("\nPlease enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.")
-      email = CLI.ask("\nPlease enter his/her email:") do |q|
-        q.validate = Helpers.valid_email?
-        q.responses[:not_valid] = "\nInvalid email entered. Please enter a valid email."
-      end
-      @friend_email = email
+
+      @friend_name = @question.ask_for_name("Please enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.\n\nFriend's name:")
+      @friend_email = @question.ask_for_email("\nPlease enter #{self.friend_name}'s email:")
     end
 
     # Complete setting the goal
     def finish_setting_goal
       system "clear"
+
+      # Tell the user they did a good job
       puts <<~MESSAGE 
         Awesome, that's great. Good job on turning your original goal into a SMART goal!
         You're welcome to go back at any time to add more tasks or goals you want to achieve.
       MESSAGE
+
+      # Press enter to finish
       CLI.ask("\nPress enter to finish.")
     end
 
@@ -224,13 +223,21 @@ module SmartGoals
       system "clear"
       if @goals.empty?
         choice = CLI.agree("You haven't set any goal yet. Set a goal now? (y/n)")
-        if choice
+        if choice # if yes
           create_goal
         end
+
       else
-      goals = {}
-      @goals.each_with_index { |goal, index| goals["#{index + 1}. #{goal.description}"] = goal }
-      goal = PROMPT.select("Select a goal to #{operation}:", goals)
+        # Create new hash for goals
+        goals = {}
+        
+        # Display list of goals
+        @goals.each_with_index do |goal, index|
+          goals["#{index + 1}. #{goal.description}"] = goal
+        end
+
+        # Ask the user to select a goal
+        goal = PROMPT.select("Select a goal to #{operation}:", goals)
       end
       goal
     end
@@ -238,42 +245,75 @@ module SmartGoals
     # View list of goals
     def view_goals
       system "clear"
+      
+      # Display goals menu
       goal = display_goals("view")
-      goal.display_task_management_menu
+
+      # If goal was set
+      if !goal.nil?
+        goal.display_task_management_menu # Display task management menu
+      else
+        # Just go back to main menu
+      end
     end
 
     # Edit a goal
     def edit_goal
       system "clear"
+
+      # Display goals menu
       goal = display_goals("edit")
-      loop do
-        system "clear"
-        attributes = {
-          "Description: #{goal.description}": :description,
-          "Target Date: #{goal.target_date.strftime('%d/%m/%Y')}": :target_date,
-          "Back": :back
-        }
-        attribute = PROMPT.select("Select which attribute to edit", attributes)
-        if attribute == :description
-          description = CLI.ask("Enter new description")
-          goal.description = description
-        elsif attribute == :target_date
-          target_date = Date.strptime(CLI.ask("Enter new target date"), '%d-%m-%Y')
-          goal.target_date = target_date
-        elsif attribute == :back
-          break
+
+      # If goal was set
+      if !goal.nil?
+        loop do
+          system "clear"
+
+          # Create attributes Hash to display goal describe and target date
+          attributes = {
+            "Description: #{goal.description}": :description,
+            "Target Date: #{goal.target_date.strftime('%d/%m/%Y')}": :target_date,
+            "Back": :back
+          }
+          # Display: Select which attribute to edit
+          attribute = PROMPT.select("Select which attribute to edit", attributes)
+          if attribute == :description  # User selects description
+            goal.description = @question.ask_for_description("Please enter new description")
+
+          elsif attribute == :target_date # User selects target date
+            
+            # Ask the user for a new target date in dd-mm-yyyy format
+            goal.target_date = @question.ask_for_target_date("\nPlease enter a new target date (format: dd-mm-yyyy)")
+
+          elsif attribute == :back  # User decides to press back
+            break
+          end
+
+          # Edit another attribute, otherwise go back to main menu
+          break unless CLI.agree("Edit another attribute? (y/n)")
         end
-        break unless CLI.agree("Edit another attribute? (y/n)")
+
+      else
+        # Just go back to main menu
       end
     end
 
     # Delete a goal
     def delete_goal
       system "clear"
+
+      # Display Loop: Ask the user which goal to delete
       loop do
         goal = display_goals("delete")
-        @goals.delete(goal)
-        break unless CLI.agree("Delete another goal? (y/n)")
+
+        # If goal was set
+        if !goal.nil?
+          @goals.delete(goal)
+          break unless CLI.agree("Delete another goal? (y/n)")
+        else
+          # Just go back to main menu
+          break
+        end
       end
     end
   end

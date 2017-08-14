@@ -1,5 +1,4 @@
-require 'pry'
-
+# Purpose: Generic validations, convertions and calculation
 module SmartGoals
   module Helpers
     extend self
