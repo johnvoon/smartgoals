@@ -69,7 +69,7 @@ module SmartGoals
             (index + 1).to_s.colorize(generate_color(status)),
             task.description.colorize(generate_color(status)),
             task.frequency.to_s.gsub('_', ' ').capitalize.colorize(generate_color(status)),
-            task.target_date ? task.target_date.strftime("%d/%m/%Y %I:%M %p").colorize(generate_color(status)) : ""
+            task.target_date ? task.target_date.strftime("%d/%m/%Y %I:%M:%S %p").colorize(generate_color(status)) : ""
           ] if task.status == status
         end
       else
