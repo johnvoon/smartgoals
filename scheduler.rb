@@ -13,6 +13,8 @@ module SmartGoals
     def schedule_failed_status_change(task, notification_time)
       @schedule.at notification_time.to_s do
         task.status = :failed
+        task.cancel_reminder_notification
+        task.cancel_failed_notification
         @schedule.shutdown
       end
     end

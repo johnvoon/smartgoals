@@ -1,5 +1,3 @@
-require 'pry'
-
 # Purpose: To Create Goals
 module SmartGoals
   class GoalSetter

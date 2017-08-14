@@ -202,7 +202,7 @@ module SmartGoals
           end
         todo_tasks["#{todo_tasks.length + 1}. Back"] = :back
 
-        task = PROMPT.select("Select a task to #{operation}:", todo_tasks)
+        task = PROMPT.select("\nSelect an ONGOING task to #{operation}:", todo_tasks)
       end
       # Return task choice
       task
@@ -230,20 +230,46 @@ module SmartGoals
           }
           attribute = PROMPT.select("Select which task attribute to edit", attributes)
           if attribute == :description
+
+            # Change the description
             task.description = @question.ask_for_description("Enter new description")
+            
+            # Cancel notifications
+            task.cancel_reminder_notification
+            task.cancel_failed_notification
+
+            # Re-create the notification
             task.create_reminder_notification
             task.create_failed_notification
-            schedule_recurring_task_creation(task)
-          elsif attribute == :frequency
-            frequency = get_frequency
-            task.frequency = frequency
 
+            # Shutdown previous schedule
             recurring_scheduler_first =
               @recurring_schedulers
                 .select {|scheduler| scheduler.id == task.recurring_scheduler_id }
                 .first
             recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first
 
+            # Reschedule the recurring task creation
+            schedule_recurring_task_creation(task)
+
+          elsif attribute == :frequency
+
+            # Change the frequency
+            frequency = get_frequency
+            task.frequency = frequency
+            
+            # Cancel notifications
+            task.cancel_reminder_notification
+            task.cancel_failed_notification
+
+            # Shutdown previous schedule
+            recurring_scheduler_first =
+              @recurring_schedulers
+                .select {|scheduler| scheduler.id == task.recurring_scheduler_id }
+                .first
+            recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first
+
+            # Reschedule the recurring task creation
             schedule_recurring_task_creation(task)
           elsif attribute == :back
             break
@@ -260,7 +286,13 @@ module SmartGoals
         task = get_task_choice("delete")
         # If task was set
         if task && task != :back
+          # Cancel notifications
+          task.cancel_reminder_notification
+          task.cancel_failed_notification
+
+          # Delete task from array of tasks
           @tasks.delete(task)
+
           # If recurring scheduler set, shut it down
           recurring_scheduler_first =
             @recurring_schedulers
