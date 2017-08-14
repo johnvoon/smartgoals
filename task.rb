@@ -20,7 +20,6 @@ module SmartGoals
     # Change status and colorize
     def status_color=(status)
       @status = status
-      puts status
       if @status == :completed
         self.description = self.description.colorize(:color => :black, :background => :green)
       elsif @status == :failed
