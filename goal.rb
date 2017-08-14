@@ -63,8 +63,10 @@ module SmartGoals
 
       # Check if tasks were created
       if !@tasks.empty?
-        @tasks.each_with_index do |task, index|
-          # Append tasks to rows array
+        @tasks
+        .select {|task| task.status == status }
+        .each_with_index do |task, index|
+        # Append tasks to rows array
           rows << [
             (index + 1).to_s.colorize(generate_color(status)),
             task.description.colorize(generate_color(status)),
