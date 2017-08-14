@@ -230,7 +230,7 @@ module SmartGoals
           }
           attribute = PROMPT.select("Select which task attribute to edit", attributes)
           if attribute == :description
-            task.description = @questions.ask_for_description("Enter new description")
+            task.description = @question.ask_for_description("Enter new description")
           elsif attribute == :frequency
             frequency = get_frequency
             task.frequency = frequency
