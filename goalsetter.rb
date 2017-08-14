@@ -82,16 +82,18 @@ module SmartGoals
 
           Thanks for telling us your goal!
 
-          Welcome to the Goal Refinement Centre. As you go through this process,
-          you will see your goal being transformed from vague into something specific
-          and actionable. You will know exactly what your goal is and the specific
-          tasks you need to complete to get there. You can imagine your goal now as
-          a piece of raw steel but by the time you go through this process it will be
+          Welcome to the Goal Refinement Centre. As you go 
+          through this process, your goal will be transformed 
+          from something vague into something specific and 
+          actionable. You'll know exactly what your goal is 
+          and the specific tasks you need to complete to get there. 
+          You can imagine your goal now as a piece of raw steel 
+          but by the time you go through this process it will be
           forged into a sword.
 
-          Let's start out by setting a target date for achieving your goal. If you
-          don't set a target date, your goal will just remain a fantasy. Setting a
-          target date for your goal is important step in the SMART goal process.
+          Let's start out by setting a target date for achieving 
+          your goal. If you don't set this, your goal will remain 
+          a fantasy.
         MESSAGE
 
         # Ask the user for a target date in dd-mm-yyyy format
