@@ -54,16 +54,16 @@ module SmartGoals
         end
 
         case choice
-          when '1'  # Create a SMART Goal
-            create_goal
-          when '2'  # View a SMART Goal
-            view_goals
-          when '3'  # Edit a SMART Goal
-            edit_goal
-          when '4'  # Delete a SMART Goal
-            delete_goal
-          when '5'  # Exit
-            break
+        when '1'  # Create a SMART Goal
+          create_goal
+        when '2'  # View a SMART Goal
+          view_goals
+        when '3'  # Edit a SMART Goal
+          edit_goal
+        when '4'  # Delete a SMART Goal
+          delete_goal
+        when '5'  # Exit
+          break
         end
       end
     end
@@ -71,52 +71,71 @@ module SmartGoals
     # Create a new goal
     def create_goal
       system "clear"
-      goal = Goal.new
+      if CLI.agree("Create a new goal? (y/n)")
+        goal = Goal.new
 
-      # Ask the user for his Goal but not to worry about it too much at this point
-      goal.description = @question.ask_for_description("Please tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
+        # Ask the user for his Goal but not to worry about it too much at this point
+        goal.description = @question.ask_for_description("\nPlease tell us your goal. Don't worry about it too much at this point.\nWe are just trying to get a base direction and will refine it later.\n\nDescribe your Goal:\n")
 
-      # The goal description has been set. Thank the user. Tell him more about the app.
-      puts <<~MESSAGE
+        # The goal description has been set. Thank the user. Tell him more about the app.
+        puts <<~MESSAGE
 
-        Thanks for telling us your goal!
+          Thanks for telling us your goal!
 
-        Welcome to the Goal Refinement Centre. As you go through this process,
-        you will see your goal being transformed from vague into something specific
-        and actionable. You will know exactly what your goal is and the specific
-        tasks you need to complete to get there. You can imagine your goal now as
-        a piece of raw steel but by the time you go through this process it will be
-        forged into a sword.
+          Welcome to the Goal Refinement Centre. As you go through this process,
+          you will see your goal being transformed from vague into something specific
+          and actionable. You will know exactly what your goal is and the specific
+          tasks you need to complete to get there. You can imagine your goal now as
+          a piece of raw steel but by the time you go through this process it will be
+          forged into a sword.
 
-        Let's start out by setting a target date for achieving your goal. If you
-        don't set a target date, your goal will just remain a fantasy. Setting a
-        target date for your goal is important step in the SMART goal process.
-      MESSAGE
+          Let's start out by setting a target date for achieving your goal. If you
+          don't set a target date, your goal will just remain a fantasy. Setting a
+          target date for your goal is important step in the SMART goal process.
+        MESSAGE
 
-      # Ask the user for a target date in dd-mm-yyyy format
-      goal.target_date = @question.ask_for_target_date("\nWhen would you like to achieve this Goal? (format: dd-mm-yyyy)")
+        # Ask the user for a target date in dd-mm-yyyy format
+        goal.target_date = @question.ask_for_target_date("\nWhen would you like to achieve this Goal? (format: dd-mm-yyyy)")
 
-      # Display the SMART words
-      list_smart_words
+        # Display the SMART words
+        list_smart_words
 
-      # Display: Ask the user for the goal to be more specific
-      make_goal_specific(goal)
+        # Display: Ask the user for the goal to be more specific
+        make_goal_specific(goal)
 
-      # Display: Ask the user if his goal is attainable
-      make_goal_attainable(goal)
+        # Display: Ask the user if his goal is attainable
+        make_goal_attainable(goal)
 
-      # Display: Ask the user if his goal is relevant
-      make_goal_relevant(goal)
+        # Display: Ask the user if his goal is relevant
+        make_goal_relevant(goal)
 
-      # Display: Ask the user for his friend's email
-      set_friend_email
+        # Display: Ask the user for his friend's email
+        set_friend_email
 
-      # Display: Create the tasks
-      goal.create_tasks
-      @goals << goal
+        system "clear"
+        puts <<~MESSAGE
 
-      # Display: Complete setting the goal
-      finish_setting_goal
+          At the moment your goal is still too big and daunting 
+          to be achieved. So we will need to break your goal 
+          down into a series of tasks.
+          
+          Make sure these tasks also meet the SMART criteria.
+        MESSAGE
+
+        CLI.ask("\nPress enter to continue.")
+
+        # Display: Create the tasks
+        if CLI.agree("\nDo you want to set tasks now (y/n)?")
+          goal.create_tasks
+          finish_setting_goal
+        else
+          finish_setting_goal_without_tasks
+        end
+
+        @goals << goal
+
+        # Display: Complete setting the goal
+      end
     end
 
     # Display list of SMART words
@@ -144,16 +163,14 @@ module SmartGoals
 
         YOUR CURRENT GOAL: #{goal.description}
 
-        At the moment, your goal may still be quite vague. 
-        
+        At the moment, your goal may still be quite vague.
+
         It needs to be SPECIFIC so you have a better idea of what
         you're trying to achieve.
 
         For example, a goal 'to lose weight' is not specific enough.
 
         A better goal would be 'get to 12% body-fat in 6 months'.
-
-        Try and rewrite your goal so it's more SPECIFIC.
       MESSAGE
       # Ask for a more specific goal description
       goal.description = @question.ask_for_description("\nRe-write your Goal to be more Specific:\n")
@@ -221,18 +238,31 @@ module SmartGoals
       MESSAGE
 
       # Press enter to finish
-      CLI.ask("\nPress enter to finish.")
+      CLI.ask("\nPlease press enter to finish.")
+    end
+
+    # Complete setting the goal without tasks
+    def finish_setting_goal_without_tasks
+      system "clear"
+
+      # Tell the user they did a good job
+      puts <<~MESSAGE
+
+        Good job on turning your goal into a SMART goal!
+        However, you have 1 more step to go: Setting your tasks!
+      MESSAGE
+
+      # Press enter to finish
+      CLI.ask("\nPress enter to go back to the main menu.")
     end
 
     # Display list of goals
     def display_goals(operation)
       system "clear"
       if @goals.empty?
-        choice = CLI.agree("You haven't set any goal yet. Set a goal now? (y/n)")
-        if choice # if yes
+        if CLI.agree("You haven't set any goal yet. Set a goal now? (y/n)")
           create_goal
         end
-
       else
         # Create new hash for goals
         goals = {}
@@ -242,10 +272,12 @@ module SmartGoals
           goals["#{index + 1}. #{goal.description}"] = goal
         end
 
+        goals["#{goals.length + 1}. Back"] = :back
+
         # Ask the user to select a goal
         goal = PROMPT.select("Select a goal to #{operation}:", goals)
+        goal
       end
-      goal
     end
 
     # View list of goals
@@ -256,10 +288,8 @@ module SmartGoals
       goal = display_goals("view")
 
       # If goal was set
-      if !goal.nil?
+      if goal && goal != :back
         goal.display_task_management_menu # Display task management menu
-      else
-        # Just go back to main menu
       end
     end
 
@@ -271,7 +301,7 @@ module SmartGoals
       goal = display_goals("edit")
 
       # If goal was set
-      if !goal.nil?
+      if goal && goal != :back
         loop do
           system "clear"
 
@@ -298,27 +328,18 @@ module SmartGoals
           # Edit another attribute, otherwise go back to main menu
           break unless CLI.agree("Edit another attribute? (y/n)")
         end
-
-      else
-        # Just go back to main menu
       end
     end
 
     # Delete a goal
     def delete_goal
       system "clear"
-
       # Display Loop: Ask the user which goal to delete
-      loop do
-        goal = display_goals("delete")
-
-        # If goal was set
-        if !goal.nil?
+      goal = display_goals("delete")
+      if goal && goal != :back
+        loop do
           @goals.delete(goal)
           break unless CLI.agree("Delete another goal? (y/n)")
-        else
-          # Just go back to main menu
-          break
         end
       end
     end
