@@ -1,3 +1,5 @@
+require 'pry'
+
 # Purpose: To Create Goals
 module SmartGoals
   class GoalSetter
@@ -262,6 +264,7 @@ module SmartGoals
       if @goals.empty?
         if CLI.agree("You haven't set any goal yet. Set a goal now? (y/n)")
           create_goal
+          return
         end
       else
         # Create new hash for goals
