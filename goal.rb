@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+# README.mdrequire 'pry'
+=======
+>>>>>>> 9802c1b4477b5f5d1b8430511d1eb52e9b154d21
 # Purpose: To Create Tasks
 module SmartGoals
   class Goal
@@ -259,6 +263,11 @@ module SmartGoals
       system "clear"
       loop do
         task = get_task_choice("mark complete")
+        task.status = :completed
+        task.status_color = task.status
+              
+        puts "Congratulations on completing this task!"
+        break unless CLI.agree("Mark another task complete? (y/n)")
         # If task was set
         if !task.nil?
           task.status = :completed

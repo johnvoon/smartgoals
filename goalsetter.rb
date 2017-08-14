@@ -82,10 +82,10 @@ module SmartGoals
         Thanks for telling us your goal! 
         
         Welcome to the Goal Refinement Centre. As you go through this process,
-        you will see your vague unspecific goal transform into something specific
+        you will see your goal being transformed from vague into something specific
         and actionable. You will know exactly what your goal is and the specific
         tasks you need to complete to get there. You can imagine your goal now as
-        piece of raw steel but by the time you go through this process it will be
+        a piece of raw steel but by the time you go through this process it will be
         forged into a sword.
       
         Let's start out by setting an target date for achieving your goal. If you
@@ -136,8 +136,8 @@ module SmartGoals
         You've already made your goal timely in the previous step. However you'll
         need to make your goal specific, measurable, attainable and relevant as well.
       MESSAGE
+      CLI.ask("\nPress enter to continue.")
     end
-
     # Ask the user for the goal to be more specific
     def make_goal_specific(goal)
       system "clear"
@@ -192,7 +192,7 @@ module SmartGoals
     def set_friend_email
       system "clear"
       puts <<~MESSAGE        
-        We will now go even further and implement steps that make achieving your goals virtually
+        We will now go even further and implement steps that make achieving your goal virtually
         inevitable.
 
         Goals that you're accountable to someone to achieve are much more likely to be met than
