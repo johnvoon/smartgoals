@@ -1,5 +1,6 @@
 require 'date'            # Include Date object
 require 'time'            # Include Time object
+require 'securerandom'    # Generate unique IDs
 require 'rufus-scheduler' # Gem to create a thread scheduler
 require 'highline'        # Gem to create better command line interface
 require 'tty-prompt'      # Gem to create better console prompt component
@@ -8,6 +9,7 @@ require 'os'              # Gem to detect the user's operating system
 require 'concurrent'      # Gem that provides thread safe concurrency
 require 'mail'            # Gem to create e-mail messages
 require 'colorize'        # Gem to change the color of the text
+
 
 require_relative 'helpers'    # Class which provides our validation rules, calculation and convertion
 require_relative 'question'   # Class which provides common questions and validate answers

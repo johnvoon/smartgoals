@@ -167,13 +167,13 @@ module SmartGoals
       puts <<~MESSAGE
         Is your goal ATTAINABLE?
         Is it too easy?
-        It set at the right level?
+        Is it set at the right level?
 
         Please write out why you think your goal is set at the right level.
 
       MESSAGE
       # Ask for an ATTAINABLE description
-      goal.attainable = @question.ask_for_description("Describe how your Goal can be Attainable:\n")
+      goal.attainable = @question.ask_for_description("Describe why your goal is Attainable:\n")
     end
 
     # Ask if the goal is Relevant
@@ -183,24 +183,31 @@ module SmartGoals
         Is your goal RELEVANT?
         Why is this goal important to you?
 
+        Please write out why you'd like to achieve this goal.
       MESSAGE
       # Ask for RELEVANT description
-      goal.relevant = @question.ask_for_description("Please write out why you'd like to achieve this goal.\n\nDescribe how your Goal can be Relevant:\n")
+      goal.relevant = @question.ask_for_description("\nDescribe why your goal is Relevant:\n")
     end
 
     # Ask for the user's friend's email address
     def set_friend_email
       system "clear"
       puts <<~MESSAGE        
-        We will now go even further and implement steps that make achieving your goal virtually
-        inevitable.
+        We will now go even further and implement steps that 
+        make achieving your goal virtually inevitable.
 
-        Goals that you're accountable to someone to achieve are much more likely to be met than
-        those where there isn't external pressure.
+        Goals that you're accountable to someone to achieve 
+        are much more likely to be met than those where there 
+        isn't external pressure.
 
+        Please enter the name of someone that you don't want 
+        to let down.
+
+        We will let them know if you failed to achieve your 
+        goals and get them to hassle you.
       MESSAGE
 
-      @friend_name = @question.ask_for_name("Please enter the name of someone that you don't want to let down.\nWe will let them know if you failed to achieve your goals and get them to hassle you.\n\nFriend's name:")
+      @friend_name = @question.ask_for_name("\nFriend's name:")
       @friend_email = @question.ask_for_email("\nPlease enter #{self.friend_name}'s email:")
     end
 
@@ -210,8 +217,9 @@ module SmartGoals
 
       # Tell the user they did a good job
       puts <<~MESSAGE 
-        Awesome, that's great. Good job on turning your original goal into a SMART goal!
-        You're welcome to go back at any time to add more tasks or goals you want to achieve.
+        Awesome, that's great. Good job on turning your original 
+        goal into a SMART goal! You're welcome to go back at any 
+        time to add more tasks or goals you want to achieve.
       MESSAGE
 
       # Press enter to finish

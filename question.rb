@@ -37,14 +37,14 @@ module SmartGoals
         # Ask for a target date
         def ask_for_target_date(question)
             target_date = CLI.ask(question) do |q|
-            # Validate date
-            q.validate = Helpers.valid_date?
+                # Validate date
+                q.validate = Helpers.valid_date?
 
-            # Date should be a future date
-            q.responses[:not_valid] = "The date has to be later than today. Please enter a date in the future."
+                # Date should be a future date
+                q.responses[:not_valid] = "The date has to be later than today. Please enter a date in the future."
 
-            # Date should be in dd-mm-yyyy format
-            q.responses[:invalid_type] = "Please enter a valid date in dd-mn-yyyy format."
+                # Date should be in dd-mm-yyyy format
+                q.responses[:invalid_type] = "Please enter a valid date in dd-mn-yyyy format."
             end
             # Parse the date in dd-mm-yyyy
             target_date = Time.strptime(target_date, "%d-%m-%Y")

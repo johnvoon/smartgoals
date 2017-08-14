@@ -1,4 +1,3 @@
-require 'pry'
 # Purpose: To contain the attributes of the tasks
 module SmartGoals
   class Task
@@ -12,7 +11,8 @@ module SmartGoals
     attr_accessor :frequency       # Symbol :once :daily :weekly :monthly :yearly
     attr_accessor :notifications   # ?
     attr_accessor :goal            # goal : Goal
-
+    attr_accessor :recurring_scheduler_id
+    
     # How to describe it
     def initialize
       @status = :todo # Default status is set to :todo
@@ -21,7 +21,6 @@ module SmartGoals
     # Change status and colorize
     def status_color=(status)
       @status = status
-      puts status
       if @status == :completed
         self.description = self.description.colorize(:color => :black, :background => :green)
       elsif @status == :failed
@@ -33,29 +32,28 @@ module SmartGoals
 
     # Create a scheduled reminder
     def create_reminder_notification
-      scheduler = Scheduler.new
+      @reminder_scheduler = Scheduler.new
       # Calculate remainder time
       reminder_time = case self.frequency
                       when :every_minute then self.target_date - 30
                       when :hourly then self.target_date - (60 * 30)
                       else self.target_date - (60 * 60 * 24)
                       end
-      binding.pry
       
       # Set the reminder message
       message = "Hey #{GOALSETTER.name}, this is a reminder for you to: #{self.description.uncolorize}"
 
       # Schedule a popup message
-      scheduler.schedule_popup(message, reminder_time)
+      @reminder_scheduler.schedule_popup(message, reminder_time)
 
       # Schedule an email message
-      scheduler.schedule_email(GOALSETTER.email, message, reminder_time)
+      # scheduler.schedule_email(GOALSETTER.email, message, reminder_time)
     end
 
     # Create a scheduled fail notification
     def create_failed_notification
       
-      scheduler = Scheduler.new
+      @failed_scheduler = Scheduler.new
       
       # Set the failed message
       user_message = "Hey #{GOALSETTER.name}, You did not #{self.description.uncolorize} today."
@@ -87,16 +85,25 @@ module SmartGoals
       MESSAGE
       
       # Set the color change to red for failure
-      scheduler.schedule_color_change_by_status(@target_date, self, :failed)
+      @failed_scheduler.schedule_color_change_by_status(@target_date, self, :failed)
 
       # Set the reminder message
-      scheduler.schedule_popup(user_message, self.target_date)
+      @failed_scheduler.schedule_popup(user_message, self.target_date)
       
+      @failed_scheduler.schedule_failed_status_change(self, self.target_date)
       # Schedule an email message
-      scheduler.schedule_email(GOALSETTER.email, user_email, self.target_date)
+      # @failed_scheduler.schedule_email(GOALSETTER.email, user_email, self.target_date)
 
       # Schedule an email message for user's friend
-      scheduler.schedule_email(GOALSETTER.friend_email, friend_email, self.target_date)
+      # @failed_scheduler.schedule_email(GOALSETTER.friend_email, friend_email, self.target_date)
+    end
+
+    def cancel_reminder_notification
+      @reminder_scheduler.schedule.shutdown
+    end
+    
+    def cancel_failed_notification
+      @failed_scheduler.schedule.shutdown
     end
   end
 end

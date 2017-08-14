@@ -1,10 +1,12 @@
 # Purpose: To create a schedule
 module SmartGoals
   class Scheduler
+    attr_accessor :id
     attr_accessor :schedule   # scheduler : Rufus::Scheduler
-
+    attr_accessor :type # the type of scheduler
     # How to describe it
     def initialize
+      @id = SecureRandom.uuid
       @schedule = Rufus::Scheduler.new
     end
 
@@ -13,6 +15,13 @@ module SmartGoals
       task = parent_task
       @schedule.at notification_time.to_s do
         task.status_color = status
+        @schedule.shutdown
+      end
+    end
+
+    def schedule_failed_status_change(task, notification_time)
+      @schedule.at notification_time.to_s do
+        task.status = :failed
         @schedule.shutdown
       end
     end

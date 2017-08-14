@@ -1,3 +1,4 @@
+require 'pry'
 # Purpose: To Create Tasks
 module SmartGoals
   class Goal
@@ -8,11 +9,13 @@ module SmartGoals
     attr_accessor :tasks        # tasks       : Array of Task
     attr_accessor :attainable   # attainable  : String
     attr_accessor :relevant     # relevant    : String
+    attr_accessor :recurring_schedulers
     attr_reader   :question     # question    : Question
-    
+
     # How to describe it
     def initialize
       @tasks = []
+      @recurring_schedulers = []
       @completed = false # Goal is set to "not completed" upon creation
       @question = Question.new
     end
@@ -30,30 +33,16 @@ module SmartGoals
       end
     end
 
-    # Display list of tasks for Prompt
-    def display_task_options(selected_operation) # selected_operation: String
-      # Create new hash for tasks
-      tasks = {}
-
-      # Display list of goals
-      @tasks.each_with_index do |task, index|
-        goals["#{index + 1}. #{task.description}"] = "#{index + 1}"
-      end
-
-      # Prompt user to select a task
-      selected_task = SmartGoals::PROMPT.select(
-        "Select a task to #{selected_operation}?",
-        tasks
-      )
-
-      # Return selected task
-      selected_task
-    end
-
     # Display list of tasks for Terminal Table
-    def display_tasks
+    def display_tasks(status)
       # Create rows array
       rows = []
+      table_title =
+        case status
+        when :todo then "Your Tasks To Be Done"
+        when :completed then "Your Completed Tasks"
+        when :failed then "Your Failed Tasks"
+        end
 
       # Check if tasks were created
       if !@tasks.empty?
@@ -64,7 +53,7 @@ module SmartGoals
             task.description,
             task.frequency.to_s.gsub('_', ' ').capitalize,
             task.target_date ? task.target_date.strftime("%d/%m/%Y") : ""
-          ]
+          ] if task.status == status
         end
       else
         # No tasks were created. Just display "No tasks added yet"
@@ -72,15 +61,16 @@ module SmartGoals
       end
 
       # Create terminal table for tasks
-      table = Terminal::Table.new(
-        title: "Your Tasks",
+      tasks = Terminal::Table.new(
+        title: table_title,
         headings: ['No.', 'Description', 'Recurring', 'Target Date'],
-        rows: rows
+        rows: rows,
+        style: { width: 40 }
       )
 
       # Display terminal table
       puts ""
-      puts table
+      puts tasks
     end
 
     # Display prompt for frequency
@@ -100,14 +90,16 @@ module SmartGoals
     def create_tasks
       system "clear"
       puts <<~MESSAGE
-        At the moment your goal is still too big and daunting to be achieved.
-        So we will need to break your goal down into a series of tasks.
+        At the moment your goal is still too big and daunting 
+        to be achieved. So we will need to break your goal 
+        down into a series of tasks.
+        
         Make sure these tasks also meet the SMART criteria.
       MESSAGE
       if CLI.agree("\nWould you like to set these tasks now? (y/n)")
         loop do
           display_goal(self)
-          display_tasks
+          display_tasks(:todo)
           task = Task.new
           task.description = @question.ask_for_description("\nDescribe your task:")
           task.frequency = get_frequency
@@ -115,7 +107,7 @@ module SmartGoals
 
           case task.frequency
             when :once
-              task.target_date = @question.ask_for_target_date("\nWhen do you aim to complete this task by (dd-mm-yyyy)? Make sure your timeframe is realistic.")
+              task.target_date = @question.ask_for_target_date("\nWhen do you aim to complete this task by (dd-mm-yyyy)? \nMake sure your timeframe is REALISTIC.")
 
             else
               task.target_date = Helpers.calculate_task_target_date(
@@ -129,10 +121,10 @@ module SmartGoals
           task.goal = self
           task.create_reminder_notification
           task.create_failed_notification
-          
+
           system "clear"
           display_goal(self)
-          display_tasks
+          display_tasks(:todo)
           break unless CLI.agree("\nWould you like to set a new task? (yes/no)")
         end
       end
@@ -140,8 +132,10 @@ module SmartGoals
 
     # Schedule a recurring task
     def schedule_recurring_task_creation(task)
-      scheduler = Rufus::Scheduler.new
-      scheduler.every "#{Helpers.convert_frequency_to_seconds(task.frequency).to_s}s" do
+      recurring_scheduler = Scheduler.new
+      @recurring_schedulers << recurring_scheduler
+
+      recurring_scheduler.schedule.every "#{Helpers.convert_frequency_to_seconds(task.frequency).to_s}s" do
         new_task = Task.new
         new_task.description = task.description
         new_task.frequency = task.frequency
@@ -150,6 +144,7 @@ module SmartGoals
           new_task.creation_date,
           new_task.frequency
         )
+        new_task.recurring_scheduler_id = recurring_scheduler.id
 
         new_task.create_reminder_notification
         new_task.create_failed_notification
@@ -188,15 +183,23 @@ module SmartGoals
     # Prompt for choice on Task Management Menu and Selects that Choice
     def get_task_choice(operation)
       system "clear"
+      display_tasks(:completed)
+      display_tasks(:failed)
       if @tasks.empty?
         choice = CLI.agree("You haven't set any tasks yet. Set a task now? (y/n)")
         if choice
           create_tasks
         end
       else
-        tasks = {}
-        @tasks.each_with_index { |task, index| tasks["#{index + 1}. #{task.description}"] = task }
-        task = PROMPT.select("Select a task to #{operation}:", tasks)
+        todo_tasks = {}
+        @tasks
+          .select {|task| task.status == :todo}
+          .each_with_index do |task, index|
+            todo_tasks["#{index + 1}. #{task.description}"] = task
+          end
+        todo_tasks["#{todo_tasks.length + 1}. Exit"] = :exit
+        
+        task = PROMPT.select("Select a task to #{operation}:", todo_tasks)
       end
       # Return task choice
       task
@@ -242,10 +245,17 @@ module SmartGoals
     def delete_task
       system "clear"
       loop do
+        binding.pry
         task = get_task_choice("delete")
         # If task was set
-        if !task.nil?
+        if task != :exit
           @tasks.delete(task)
+          # If recurring scheduler set, shut it down
+          recurring_scheduler_first =
+            @recurring_schedulers
+              .select {|scheduler| scheduler.id == task.recurring_scheduler_id }
+              .first
+          recurring_scheduler_first.schedule.shutdown if recurring_scheduler_first != nil
           break unless CLI.agree("Delete another task? (y/n)")
         else
           # Just go back to menu
@@ -261,7 +271,10 @@ module SmartGoals
         task = get_task_choice("mark complete")
         task.status = :completed
         task.status_color = task.status
-              
+        if task.frequency == :once
+          task.cancel_reminder_notification
+          task.cancel_failed_notification
+        end
         puts "Congratulations on completing this task!"
         break unless CLI.agree("Mark another task complete? (y/n)")
         # If task was set
