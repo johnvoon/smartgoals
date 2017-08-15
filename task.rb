@@ -43,7 +43,7 @@ module SmartGoals
       @reminder_scheduler.schedule_popup(message, reminder_time)
 
       # Schedule an email message
-      # scheduler.schedule_email(GOALSETTER.email, message, reminder_time)
+      @reminder_scheduler.schedule_email(GOALSETTER.email, message, reminder_time)
     end
 
     # Create a scheduled fail notification
@@ -86,18 +86,22 @@ module SmartGoals
       # Set the reminder message
       @failed_scheduler.schedule_popup(user_message, self.target_date)
       
+      # Set status to failed
       @failed_scheduler.schedule_failed_status_change(self, self.target_date)
+      
       # Schedule an email message
-      # @failed_scheduler.schedule_email(GOALSETTER.email, user_email, self.target_date)
+      #@failed_scheduler.schedule_email(GOALSETTER.email, user_email, self.target_date)
 
       # Schedule an email message for user's friend
-      # @failed_scheduler.schedule_email(GOALSETTER.friend_email, friend_email, self.target_date)
+      #@failed_scheduler.schedule_email(GOALSETTER.friend_email, friend_email, self.target_date)
     end
 
+    # Cancel Reminders
     def cancel_reminder_notification
       @reminder_scheduler.schedule.shutdown
     end
     
+    # Cancel Failed Notifications
     def cancel_failed_notification
       @failed_scheduler.schedule.shutdown
     end
